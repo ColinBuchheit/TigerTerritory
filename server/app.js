@@ -45,11 +45,11 @@ app.use(express.urlencoded({ extended: false }));
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(logger);
-}
-
+    app.use(morgan('dev'));
+  } else {
+    const { middleware } = require('./middleware/logger');
+    app.use(middleware);
+  }
 // Rate limiting
 app.use('/api/', apiLimiter);
 

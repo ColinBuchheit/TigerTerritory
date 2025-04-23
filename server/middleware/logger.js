@@ -67,7 +67,7 @@ const logger = winston.createLogger({
 });
 
 // Express middleware function
-logger.middleware = (req, res, next) => {
+const middleware = (req, res, next) => {
   const start = new Date();
   
   // Log request
@@ -111,5 +111,8 @@ logger.middleware = (req, res, next) => {
   next();
 };
 
-// Export the logger
-module.exports = logger;
+// Export both the logger and middleware function
+module.exports = {
+  logger,
+  middleware
+};

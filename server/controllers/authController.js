@@ -3,20 +3,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const { formatResponse } = require('../utils/responseFormatter');
-const { validationResult } = require('express-validator');
+const { validateRequest, asyncHandler, checkResourceNotFound } = require('../utils/controllerHelpers');
 
 /**
  * @desc    Register a new user
  * @route   POST /api/auth/register
  * @access  Public
  */
-exports.register = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(formatResponse(false, 'Validation error', errors.array()));
-    }
-
+exports.register = asyncHandler(async (req, res) => {
+  return validateRequest(req, res, async () => {
     const { name, email, password } = req.body;
 
     // Check if user exists
@@ -54,24 +49,16 @@ exports.register = async (req, res) => {
         res.status(201).json(formatResponse(true, 'User registered successfully', { token }));
       }
     );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+  });
+});
 
 /**
  * @desc    Authenticate user & get token
  * @route   POST /api/auth/login
  * @access  Public
  */
-exports.login = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(formatResponse(false, 'Validation error', errors.array()));
-    }
-
+exports.login = asyncHandler(async (req, res) => {
+  return validateRequest(req, res, async () => {
     const { email, password } = req.body;
 
     // Check if user exists
@@ -102,26 +89,18 @@ exports.login = async (req, res) => {
         res.json(formatResponse(true, 'Login successful', { token }));
       }
     );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+  });
+});
 
 /**
  * @desc    Get current user
  * @route   GET /api/auth/me
  * @access  Private
  */
-exports.getCurrentUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    if (!user) {
-      return res.status(404).json(formatResponse(false, 'User not found', null));
-    }
-    res.json(formatResponse(true, 'User retrieved successfully', user));
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+exports.getCurrentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+  
+  if (checkResourceNotFound(user, res, 'User')) return;
+  
+  res.json(formatResponse(true, 'User retrieved successfully', user));
+});

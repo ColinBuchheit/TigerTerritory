@@ -1,28 +1,21 @@
 const Comment = require('../models/Comment');
 const Post = require('../models/Post');
 const { formatResponse } = require('../utils/responseFormatter');
-const { validationResult } = require('express-validator');
+const { validateRequest, asyncHandler, checkResourceNotFound, checkUnauthorized } = require('../utils/controllerHelpers');
 
 /**
  * @desc    Add comment to a post
  * @route   POST /api/comments/:postId
  * @access  Private
  */
-exports.addComment = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(formatResponse(false, 'Validation error', errors.array()));
-    }
-    
+exports.addComment = asyncHandler(async (req, res) => {
+  return validateRequest(req, res, async () => {
     const { text } = req.body;
     const postId = req.params.postId;
     
     // Check if post exists
     const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json(formatResponse(false, 'Post not found', null));
-    }
+    if (checkResourceNotFound(post, res, 'Post')) return;
     
     // Create new comment
     const newComment = new Comment({
@@ -38,75 +31,49 @@ exports.addComment = async (req, res) => {
     post.comments.push(comment._id);
     await post.save();
     
-    // Populate user info
-    await comment.populate('user', ['name']).execPopulate();
+    // Populate user info - removed .execPopulate()
+    await comment.populate('user', ['name']);
     
     res.status(201).json(formatResponse(true, 'Comment added successfully', comment));
-  } catch (err) {
-    console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json(formatResponse(false, 'Post not found', null));
-    }
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+  });
+});
 
 /**
  * @desc    Get comments for a post
  * @route   GET /api/comments/:postId
  * @access  Public
  */
-exports.getCommentsByPost = async (req, res) => {
-  try {
-    const postId = req.params.postId;
-    
-    // Check if post exists
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json(formatResponse(false, 'Post not found', null));
-    }
-    
-    // Get comments
-    const comments = await Comment.find({ post: postId })
-      .sort({ date: -1 })
-      .populate('user', ['name']);
-    
-    res.json(formatResponse(true, 'Comments retrieved successfully', comments));
-  } catch (err) {
-    console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json(formatResponse(false, 'Post not found', null));
-    }
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+exports.getCommentsByPost = asyncHandler(async (req, res) => {
+  const postId = req.params.postId;
+  
+  // Check if post exists
+  const post = await Post.findById(postId);
+  if (checkResourceNotFound(post, res, 'Post')) return;
+  
+  // Get comments
+  const comments = await Comment.find({ post: postId })
+    .sort({ date: -1 })
+    .populate('user', ['name']);
+  
+  res.json(formatResponse(true, 'Comments retrieved successfully', comments));
+});
 
 /**
  * @desc    Update a comment
  * @route   PUT /api/comments/:id
  * @access  Private
  */
-exports.updateComment = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json(formatResponse(false, 'Validation error', errors.array()));
-    }
-    
+exports.updateComment = asyncHandler(async (req, res) => {
+  return validateRequest(req, res, async () => {
     const { text } = req.body;
     
     // Find comment
     let comment = await Comment.findById(req.params.id);
     
-    // Check if comment exists
-    if (!comment) {
-      return res.status(404).json(formatResponse(false, 'Comment not found', null));
-    }
+    if (checkResourceNotFound(comment, res, 'Comment')) return;
     
     // Check user is comment owner
-    if (comment.user.toString() !== req.user.id) {
-      return res.status(401).json(formatResponse(false, 'Not authorized to update this comment', null));
-    }
+    if (checkUnauthorized(comment, req.user.id, res, 'update')) return;
     
     // Update comment
     comment = await Comment.findByIdAndUpdate(
@@ -116,50 +83,31 @@ exports.updateComment = async (req, res) => {
     ).populate('user', ['name']);
     
     res.json(formatResponse(true, 'Comment updated successfully', comment));
-  } catch (err) {
-    console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json(formatResponse(false, 'Comment not found', null));
-    }
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+  });
+});
 
 /**
  * @desc    Delete a comment
  * @route   DELETE /api/comments/:id
  * @access  Private
  */
-exports.deleteComment = async (req, res) => {
-  try {
-    // Find comment
-    const comment = await Comment.findById(req.params.id);
-    
-    // Check if comment exists
-    if (!comment) {
-      return res.status(404).json(formatResponse(false, 'Comment not found', null));
-    }
-    
-    // Check user is comment owner
-    if (comment.user.toString() !== req.user.id) {
-      return res.status(401).json(formatResponse(false, 'Not authorized to delete this comment', null));
-    }
-    
-    // Remove comment from post's comments array
-    await Post.findByIdAndUpdate(
-      comment.post,
-      { $pull: { comments: comment._id } }
-    );
-    
-    // Delete comment
-    await comment.remove();
-    
-    res.json(formatResponse(true, 'Comment deleted successfully', {}));
-  } catch (err) {
-    console.error(err.message);
-    if (err.kind === 'ObjectId') {
-      return res.status(404).json(formatResponse(false, 'Comment not found', null));
-    }
-    res.status(500).json(formatResponse(false, 'Server error', null));
-  }
-};
+exports.deleteComment = asyncHandler(async (req, res) => {
+  // Find comment
+  const comment = await Comment.findById(req.params.id);
+  
+  if (checkResourceNotFound(comment, res, 'Comment')) return;
+  
+  // Check user is comment owner
+  if (checkUnauthorized(comment, req.user.id, res, 'delete')) return;
+  
+  // Remove comment from post's comments array
+  await Post.findByIdAndUpdate(
+    comment.post,
+    { $pull: { comments: comment._id } }
+  );
+  
+  // Delete comment - replaced deprecated remove() with deleteOne()
+  await Comment.deleteOne({ _id: comment._id });
+  
+  res.json(formatResponse(true, 'Comment deleted successfully', {}));
+});
