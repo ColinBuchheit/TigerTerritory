@@ -16,8 +16,9 @@ exports.loginValidation = [
 
 // Comment validation
 exports.commentValidation = [
-  check('text', 'Text is required').not().isEmpty()
-];
+  check('text', 'Text is required').not().isEmpty(),
+  check('text', 'Comment cannot exceed 1000 characters').isLength({ max: 1000 })
+];;
 
 // Schedule validation
 exports.scheduleValidation = [
