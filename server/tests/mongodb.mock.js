@@ -28,22 +28,25 @@ jest.mock('mongodb-memory-server', () => {
   jest.mock('mongoose', () => {
     const originalMongoose = jest.requireActual('mongoose');
     
+    // Create a mock connection object
+    const mockConnection = {
+      host: 'localhost',
+      collections: {},
+      readyState: 1,
+      on: jest.fn(),
+      once: jest.fn(),
+      close: jest.fn().mockResolvedValue(true)
+    };
+    
     return {
       ...originalMongoose,
       connect: jest.fn().mockResolvedValue({
-        connection: {
-          host: 'localhost',
-          on: jest.fn(),
-          once: jest.fn(),
-          close: jest.fn().mockResolvedValue(true)
-        }
+        connection: mockConnection
       }),
       disconnect: jest.fn().mockResolvedValue(true),
       connection: {
         ...originalMongoose.connection,
-        collections: {},
-        on: jest.fn(),
-        close: jest.fn().mockResolvedValue(true)
+        ...mockConnection
       }
     };
   });

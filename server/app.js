@@ -22,8 +22,10 @@ const logger = require('./middleware/logger');
 // Initialize express app
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB only in non-test environment
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // CORS configuration
 const corsOptions = {
@@ -50,8 +52,11 @@ if (process.env.NODE_ENV === 'development') {
     const { middleware } = require('./middleware/logger');
     app.use(middleware);
   }
-// Rate limiting
-app.use('/api/', apiLimiter);
+  
+// Rate limiting - disable in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.use('/api/', apiLimiter);
+}
 
 // API Documentation with Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, { 

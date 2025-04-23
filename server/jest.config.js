@@ -7,5 +7,10 @@ module.exports = {
     resetMocks: true,
     restoreMocks: true,
     testTimeout: 30000,
-    setupFilesAfterEnv: ['./tests/setup.js']
+    setupFilesAfterEnv: ['./tests/setup.js'],
+    // Set NODE_ENV to test for all tests
+    testEnvironment: 'node',
+    testEnvironmentOptions: {
+      NODE_ENV: 'test'
+    }
   };

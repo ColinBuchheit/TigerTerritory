@@ -9,6 +9,11 @@ let mongoServer;
 
 // Setup in-memory MongoDB server
 beforeAll(async () => {
+  // Close any existing connection first
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+  
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
   
