@@ -7,10 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "set NODE_ENV=test && jest --forceExit",
-    "test:watch": "set NODE_ENV=test && jest --watch",
-    "test:detectOpenHandles": "set NODE_ENV=test && jest --detectOpenHandles",
-    "test:verbose": "set NODE_ENV=test && jest --forceExit --verbose",
+    "test": "cross-env NODE_ENV=test jest --forceExit",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:detectOpenHandles": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "test:verbose": "cross-env NODE_ENV=test jest --forceExit --verbose",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },

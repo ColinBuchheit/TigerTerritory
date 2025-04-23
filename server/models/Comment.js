@@ -18,9 +18,7 @@ const Schema = mongoose.Schema;
  *         user:
  *           type: string
  *           description: ID of the user who created the comment
- *         post:
- *           type: string
- *           description: ID of the post this comment belongs to
+ *         
  *         likes:
  *           type: array
  *           items:
@@ -40,11 +38,6 @@ const CommentSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  },
-  post: {
-    type: Schema.Types.ObjectId,
-    ref: 'Post',
     required: true
   },
   likes: [

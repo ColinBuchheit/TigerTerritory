@@ -24,11 +24,9 @@ const runAllSeeders = async () => {
     
     console.log('Starting database seeding process...');
     
-    // Run seeders in order
+    // Run seeders in order (no need for postSeeder as posts are hardcoded)
     await runSeeder('userSeeder.js');
-    await runSeeder('postSeeder.js');
     await runSeeder('commentSeeder.js');
-    await runSeeder('scheduleSeeder.js');
     
     console.log('All data seeded successfully! 🎉');
     process.exit(0);

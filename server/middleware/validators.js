@@ -13,12 +13,6 @@ exports.loginValidation = [
   check('password', 'Password is required').exists()
 ];
 
-// Post validation
-exports.postValidation = [
-  check('title', 'Title is required').not().isEmpty(),
-  check('content', 'Content is required').not().isEmpty(),
-  check('category', 'Category is required').not().isEmpty()
-];
 
 // Comment validation
 exports.commentValidation = [

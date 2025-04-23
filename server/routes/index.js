@@ -3,9 +3,7 @@ const router = express.Router();
 
 // Import individual route files
 const authRoutes = require('./authRoutes');
-const postRoutes = require('./postRoutes');
 const commentRoutes = require('./commentRoutes');
-const scheduleRoutes = require('./scheduleRoutes');
 
 /**
  * @swagger
@@ -13,11 +11,9 @@ const scheduleRoutes = require('./scheduleRoutes');
  *   - name: Authentication
  *     description: User authentication
  *   - name: Posts
- *     description: Sports news and blog posts
+ *     description: Sports news and blog posts (read-only)
  *   - name: Comments
  *     description: Post comments
- *   - name: Schedules
- *     description: Sports game schedules
  */
 
 /**
@@ -40,8 +36,6 @@ router.get('/', (req, res) => {
 
 // Define API routes
 router.use('/auth', authRoutes);
-router.use('/posts', postRoutes);
 router.use('/comments', commentRoutes);
-router.use('/schedules', scheduleRoutes);
 
 module.exports = router;

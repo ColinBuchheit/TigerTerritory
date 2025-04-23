@@ -1,5 +1,4 @@
 const Comment = require('../models/Comment');
-const Post = require('../models/Post');
 const { formatResponse } = require('../utils/responseFormatter');
 const { validateRequest, asyncHandler, checkResourceNotFound, checkUnauthorized } = require('../utils/controllerHelpers');
 
