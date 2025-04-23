@@ -1,16 +1,16 @@
-import User, { findOne, findById } from '../models/user';
-import { genSalt, hash, compare } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-import { jwtSecret, jwtExpiresIn } from '../config/config';
-import { formatResponse } from '../utils/responseFormatter';
-import { validationResult } from 'express-validator';
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
+const { formatResponse } = require('../utils/responseFormatter');
+const { validationResult } = require('express-validator');
 
 /**
  * @desc    Register a new user
  * @route   POST /api/auth/register
  * @access  Public
  */
-export async function register(req, res) {
+exports.register = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -20,7 +20,7 @@ export async function register(req, res) {
     const { name, email, password } = req.body;
 
     // Check if user exists
-    let user = await findOne({ email });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json(formatResponse(false, 'User already exists', null));
     }
@@ -33,8 +33,8 @@ export async function register(req, res) {
     });
 
     // Hash password
-    const salt = await genSalt(10);
-    user.password = await hash(password, salt);
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
 
     await user.save();
 
@@ -45,10 +45,10 @@ export async function register(req, res) {
       }
     };
 
-    sign(
+    jwt.sign(
       payload,
-      jwtSecret,
-      { expiresIn: jwtExpiresIn },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiresIn },
       (err, token) => {
         if (err) throw err;
         res.status(201).json(formatResponse(true, 'User registered successfully', { token }));
@@ -58,14 +58,14 @@ export async function register(req, res) {
     console.error(err.message);
     res.status(500).json(formatResponse(false, 'Server error', null));
   }
-}
+};
 
 /**
  * @desc    Authenticate user & get token
  * @route   POST /api/auth/login
  * @access  Public
  */
-export async function login(req, res) {
+exports.login = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -75,13 +75,13 @@ export async function login(req, res) {
     const { email, password } = req.body;
 
     // Check if user exists
-    const user = await findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(400).json(formatResponse(false, 'Invalid credentials', null));
     }
 
     // Check password
-    const isMatch = await compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json(formatResponse(false, 'Invalid credentials', null));
     }
@@ -93,10 +93,10 @@ export async function login(req, res) {
       }
     };
 
-    sign(
+    jwt.sign(
       payload,
-      jwtSecret,
-      { expiresIn: jwtExpiresIn },
+      config.jwtSecret,
+      { expiresIn: config.jwtExpiresIn },
       (err, token) => {
         if (err) throw err;
         res.json(formatResponse(true, 'Login successful', { token }));
@@ -106,16 +106,16 @@ export async function login(req, res) {
     console.error(err.message);
     res.status(500).json(formatResponse(false, 'Server error', null));
   }
-}
+};
 
 /**
  * @desc    Get current user
  * @route   GET /api/auth/me
  * @access  Private
  */
-export async function getCurrentUser(req, res) {
+exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json(formatResponse(false, 'User not found', null));
     }
@@ -124,4 +124,4 @@ export async function getCurrentUser(req, res) {
     console.error(err.message);
     res.status(500).json(formatResponse(false, 'Server error', null));
   }
-}
+};

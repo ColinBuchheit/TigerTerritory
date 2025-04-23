@@ -59,7 +59,8 @@ const PostSchema = new Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['Football', 'Basketball', 'Baseball', 'Hockey', 'Soccer', 'Tennis', 'Golf', 'Other']
+    enum: ['Football', 'Basketball', 'Baseball', 'Hockey', 'Soccer', 'Tennis', 'Golf', 'Other'],
+    index: true // Add index for category lookups
   },
   imageUrl: {
     type: String,
@@ -68,7 +69,8 @@ const PostSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true // Add index for user lookups
   },
   likes: [
     {
@@ -88,9 +90,15 @@ const PostSchema = new Schema({
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: true // Add index for date sorting
   }
+}, {
+  timestamps: true // Add createdAt and updatedAt timestamps
 });
+
+// Compound index for category + date for common post listing queries
+PostSchema.index({ category: 1, date: -1 });
 
 // Method to increase view count
 PostSchema.methods.incrementViews = function() {
@@ -106,6 +114,23 @@ PostSchema.virtual('likeCount').get(function() {
 // Virtual for comment count
 PostSchema.virtual('commentCount').get(function() {
   return this.comments.length;
+});
+
+// Virtual for excerpt (for previews)
+PostSchema.virtual('excerpt').get(function() {
+  if (!this.content) return '';
+  return this.content.length > 200 
+    ? `${this.content.substring(0, 200)}...` 
+    : this.content;
+});
+
+// Virtual for formatted date
+PostSchema.virtual('formattedDate').get(function() {
+  return new Date(this.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 });
 
 // Ensure virtuals are included when converting to JSON/Object

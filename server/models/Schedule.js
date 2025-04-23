@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const moment = require('moment');
 
 /**
  * @swagger
@@ -163,6 +164,34 @@ ScheduleSchema.virtual('isAwayWinning').get(function() {
 // Virtual to determine if the game is tied
 ScheduleSchema.virtual('isTied').get(function() {
   return this.score.home === this.score.away;
+});
+
+// Virtual to get the score difference
+ScheduleSchema.virtual('scoreDifference').get(function() {
+  return Math.abs(this.score.home - this.score.away);
+});
+
+// Virtual to get formatted start time
+ScheduleSchema.virtual('formattedStartTime').get(function() {
+  return moment(this.startTime).format('MMMM D, YYYY h:mm A');
+});
+
+// Virtual to get relative start time
+ScheduleSchema.virtual('relativeStartTime').get(function() {
+  return moment(this.startTime).fromNow();
+});
+
+// Virtual to get game duration in minutes (if both start and end times are available)
+ScheduleSchema.virtual('durationMinutes').get(function() {
+  if (this.startTime && this.endTime) {
+    return moment(this.endTime).diff(moment(this.startTime), 'minutes');
+  }
+  return null;
+});
+
+// Virtual to create a display name for the match
+ScheduleSchema.virtual('matchDisplay').get(function() {
+  return `${this.homeTeam.name} vs ${this.awayTeam.name}`;
 });
 
 // Ensure virtuals are included when converting to JSON/Object

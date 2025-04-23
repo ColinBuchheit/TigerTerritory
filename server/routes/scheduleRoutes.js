@@ -7,7 +7,7 @@ const { scheduleValidation } = require('../middleware/validators');
 
 /**
  * @swagger
- * /api/schedules:
+ * /schedules:
  *   get:
  *     summary: Get all schedules
  *     tags: [Schedules]
@@ -43,7 +43,7 @@ router.get('/', scheduleController.getSchedules);
 
 /**
  * @swagger
- * /api/schedules/upcoming:
+ * /schedules/upcoming:
  *   get:
  *     summary: Get upcoming schedules
  *     tags: [Schedules]
@@ -57,7 +57,7 @@ router.get('/upcoming', scheduleController.getUpcomingSchedules);
 
 /**
  * @swagger
- * /api/schedules/live:
+ * /schedules/live:
  *   get:
  *     summary: Get live schedules
  *     tags: [Schedules]
@@ -71,7 +71,7 @@ router.get('/live', scheduleController.getLiveSchedules);
 
 /**
  * @swagger
- * /api/schedules/{id}:
+ * /schedules/{id}:
  *   get:
  *     summary: Get schedule by ID
  *     tags: [Schedules]
@@ -94,7 +94,7 @@ router.get('/:id', scheduleController.getScheduleById);
 
 /**
  * @swagger
- * /api/schedules:
+ * /schedules:
  *   post:
  *     summary: Create a new schedule
  *     tags: [Schedules]
@@ -120,7 +120,7 @@ router.post('/', [auth, adminAuth, scheduleValidation], scheduleController.creat
 
 /**
  * @swagger
- * /api/schedules/{id}:
+ * /schedules/{id}:
  *   put:
  *     summary: Update a schedule
  *     tags: [Schedules]
@@ -155,7 +155,7 @@ router.put('/:id', [auth, adminAuth, scheduleValidation], scheduleController.upd
 
 /**
  * @swagger
- * /api/schedules/{id}:
+ * /schedules/{id}:
  *   delete:
  *     summary: Delete a schedule
  *     tags: [Schedules]

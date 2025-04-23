@@ -9,11 +9,34 @@ const { validationResult } = require('express-validator');
  */
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await Post.find()
+    // Get query parameters for pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+    
+    // Get category filter if provided
+    const filter = {};
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    
+    const posts = await Post.find(filter)
       .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit)
       .populate('user', ['name']);
     
-    res.json(formatResponse(true, 'Posts retrieved successfully', posts));
+    // Get total count for pagination info
+    const total = await Post.countDocuments(filter);
+    
+    const paginationInfo = {
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit)
+    };
+    
+    res.json(formatResponse(true, 'Posts retrieved successfully', { posts, pagination: paginationInfo }));
   } catch (err) {
     console.error(err.message);
     res.status(500).json(formatResponse(false, 'Server error', null));
@@ -151,8 +174,8 @@ exports.deletePost = async (req, res) => {
       return res.status(401).json(formatResponse(false, 'Not authorized to delete this post', null));
     }
     
-    // Delete post
-    await post.remove();
+    // Delete post - using deleteOne instead of deprecated remove()
+    await Post.deleteOne({ _id: post._id });
     
     res.json(formatResponse(true, 'Post deleted successfully', {}));
   } catch (err) {
