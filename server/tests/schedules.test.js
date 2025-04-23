@@ -2,6 +2,8 @@ const request = require('supertest');
 const app = require('../app');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
 describe('Schedules Endpoints', () => {
   let userToken;
@@ -9,43 +11,62 @@ describe('Schedules Endpoints', () => {
   let scheduleId;
   
   beforeEach(async () => {
-    // Create a regular user
-    const userRes = await request(app)
-      .post('/api/auth/register')
-      .send({
-        name: 'Schedule User',
-        email: 'schedules@example.com',
-        password: 'password123'
-      });
+    // Create a regular user directly
+    const regularUser = new User({
+      name: 'Schedule User',
+      email: 'schedules-test@example.com', // Use a unique email
+      password: 'password123',
+      role: 'user'
+    });
     
-    userToken = userRes.body.data.token;
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    regularUser.password = await bcrypt.hash('password123', salt);
     
-    // Create an admin user manually
-    const user = await User.findOne({ email: 'admin@example.com' });
-    if (!user) {
+    await regularUser.save();
+    
+    // Generate token for regular user
+    userToken = jwt.sign(
+      { user: { id: regularUser._id.toString() } },
+      config.jwtSecret,
+      { expiresIn: '1h' }
+    );
+    
+    // Find the existing admin user (created in setup.js)
+    const adminUser = await User.findOne({ email: 'admin@example.com' });
+    
+    if (!adminUser) {
+      // Only create if it doesn't exist (shouldn't happen, but just in case)
       const newAdmin = new User({
         name: 'Admin User',
-        email: 'admin@example.com',
+        email: 'admin-test@example.com', // Use a different email
         password: 'password123',
         role: 'admin'
       });
       
       // Hash password
-      const salt = await bcrypt.genSalt(10);
       newAdmin.password = await bcrypt.hash('password123', salt);
-      
       await newAdmin.save();
+      
+      // Generate token for admin
+      adminToken = jwt.sign(
+        { user: { id: newAdmin._id.toString() } },
+        config.jwtSecret,
+        { expiresIn: '1h' }
+      );
+    } else {
+      // Use existing admin
+      adminToken = jwt.sign(
+        { user: { id: adminUser._id.toString() } },
+        config.jwtSecret,
+        { expiresIn: '1h' }
+      );
     }
-    
-    // Login admin
-    const loginRes = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'admin@example.com',
-        password: 'password123'
-      });
-    
-    adminToken = loginRes.body.data.token;
+  });
+  
+  afterEach(async () => {
+    // Clean up test data
+    await User.deleteMany({ email: 'schedules-test@example.com' });
   });
   
   describe('POST /api/schedules', () => {

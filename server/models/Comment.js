@@ -10,7 +10,7 @@ const Schema = mongoose.Schema;
  *       required:
  *         - text
  *         - user
- *         - post
+ *         - postId
  *       properties:
  *         text:
  *           type: string
@@ -18,7 +18,9 @@ const Schema = mongoose.Schema;
  *         user:
  *           type: string
  *           description: ID of the user who created the comment
- *         
+ *         postId:
+ *           type: string
+ *           description: ID of the hardcoded post this comment belongs to
  *         likes:
  *           type: array
  *           items:
@@ -39,6 +41,11 @@ const CommentSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  // Change from ObjectId reference to simple string ID
+  postId: {
+    type: String,
+    required: [true, 'Post ID is required']
   },
   likes: [
     {

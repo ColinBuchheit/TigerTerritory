@@ -21,8 +21,6 @@ const { apiLimiter } = require('../middleware/rateLimiter');
  *     responses:
  *       200:
  *         description: List of comments
- *       404:
- *         description: Post not found
  *       500:
  *         description: Server error
  */
@@ -61,8 +59,6 @@ router.get('/:postId', commentController.getCommentsByPost);
  *         description: Validation error
  *       401:
  *         description: Not authorized
- *       404:
- *         description: Post not found
  *       500:
  *         description: Server error
  */

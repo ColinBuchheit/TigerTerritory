@@ -12,22 +12,14 @@ exports.addComment = asyncHandler(async (req, res) => {
     const { text } = req.body;
     const postId = req.params.postId;
     
-    // Check if post exists
-    const post = await Post.findById(postId);
-    if (checkResourceNotFound(post, res, 'Post')) return;
-    
     // Create new comment
     const newComment = new Comment({
       text,
-      post: postId,
+      postId: postId,
       user: req.user.id
     });
     
     const comment = await newComment.save();
-    
-    post.comments.push(comment._id);
-    await post.save();
-    
     await comment.populate('user', ['name']);
     
     res.status(201).json(formatResponse(true, 'Comment added successfully', comment));
@@ -42,10 +34,7 @@ exports.addComment = asyncHandler(async (req, res) => {
 exports.getCommentsByPost = asyncHandler(async (req, res) => {
   const postId = req.params.postId;
   
-  const post = await Post.findById(postId);
-  if (checkResourceNotFound(post, res, 'Post')) return;
-  
-  const comments = await Comment.find({ post: postId })
+  const comments = await Comment.find({ postId: postId })
     .sort({ date: -1 })
     .populate('user', ['name']);
   
@@ -90,11 +79,6 @@ exports.deleteComment = asyncHandler(async (req, res) => {
   if (checkResourceNotFound(comment, res, 'Comment')) return;
   
   if (checkUnauthorized(comment, req.user.id, res, 'delete')) return;
-  
-  await Post.findByIdAndUpdate(
-    comment.post,
-    { $pull: { comments: comment._id } }
-  );
   
   await Comment.deleteOne({ _id: comment._id });
   

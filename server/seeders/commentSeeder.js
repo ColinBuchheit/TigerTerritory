@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Comment = require('../models/Comment');
-const Post = require('../models/Post');
 const User = require('../models/user');
 const config = require('../config/config');
 
@@ -35,25 +34,28 @@ const seedComments = async () => {
       process.exit(1);
     }
     
-    // Get post IDs
-    const posts = await Post.find();
-    
-    if (posts.length === 0) {
-      console.error('No posts found. Please run postSeeder first.');
-      process.exit(1);
-    }
-    
-    // Clear comments arrays from posts
-    for (const post of posts) {
-      post.comments = [];
-      await post.save();
-    }
+    // Sample hardcoded post IDs (matching what you'll use in frontend)
+    const postIds = [
+      'basketball-news-1',
+      'football-news-1',
+      'tennis-news-1',
+      'soccer-news-1',
+      'baseball-news-1'
+    ];
     
     // Sample comments data
     const comments = [];
     
     // Generate comments for each post
-    for (const post of posts) {
+    for (const postId of postIds) {
+      // Determine category from postId
+      let category = 'Other';
+      if (postId.includes('basketball')) category = 'Basketball';
+      if (postId.includes('football')) category = 'Football';
+      if (postId.includes('tennis')) category = 'Tennis';
+      if (postId.includes('soccer')) category = 'Soccer';
+      if (postId.includes('baseball')) category = 'Baseball';
+      
       // Add 3-5 comments per post
       const commentCount = Math.floor(Math.random() * 3) + 3;
       
@@ -62,9 +64,9 @@ const seedComments = async () => {
         const user = users[Math.floor(Math.random() * users.length)];
         
         comments.push({
-          text: getSampleComment(post.category, i),
+          text: getSampleComment(category, i),
           user: user._id,
-          post: post._id,
+          postId: postId,
           date: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)) // Random date within the last week
         });
       }
@@ -73,15 +75,6 @@ const seedComments = async () => {
     // Insert comments
     const savedComments = await Comment.insertMany(comments);
     console.log('Comments seeded successfully');
-    
-    // Add comment IDs to posts
-    for (const comment of savedComments) {
-      await Post.findByIdAndUpdate(
-        comment.post,
-        { $push: { comments: comment._id } }
-      );
-    }
-    console.log('Comments added to posts');
     
     // Get and log the created comments
     const seededComments = await Comment.find();
