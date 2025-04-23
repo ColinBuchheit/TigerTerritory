@@ -1,0 +1,83 @@
+User:
+  type: object
+  required:
+    - name
+    - email
+    - password
+  properties:
+    id:
+      type: string
+      description: User ID
+      example: "60d21b4667d0d8992e610c85"
+    name:
+      type: string
+      description: User's full name
+      example: "John Doe"
+    email:
+      type: string
+      format: email
+      description: User's email address
+      example: "john@example.com"
+    password:
+      type: string
+      description: User's password (hashed, never returned in responses)
+      example: "$2a$10$CwTycUXWue0Thq9StjUM0u"
+    avatar:
+      type: string
+      description: URL to user's avatar image
+      example: "https://gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+    role:
+      type: string
+      enum: [user, admin]
+      default: user
+      description: User's role in the system
+      example: "user"
+    date:
+      type: string
+      format: date-time
+      description: Date when user was created
+      example: "2023-04-10T12:00:00Z"
+
+UserResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      description: User ID
+    name:
+      type: string
+      description: User's full name
+    email:
+      type: string
+      description: User's email address
+    avatar:
+      type: string
+      description: URL to user's avatar image
+    role:
+      type: string
+      description: User's role in the system
+    date:
+      type: string
+      format: date-time
+      description: Date when user was created
+
+AuthCredentials:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      description: User's email address
+    password:
+      type: string
+      description: User's password
+
+TokenResponse:
+  type: object
+  properties:
+    token:
+      type: string
+      description: JWT token

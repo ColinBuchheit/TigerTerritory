@@ -1,0 +1,132 @@
+Schedule:
+  type: object
+  required:
+    - sport
+    - league
+    - homeTeam
+    - awayTeam
+    - venue
+    - startTime
+    - status
+  properties:
+    id:
+      type: string
+      description: Schedule ID
+      example: "60d21b4667d0d8992e610c85"
+    sport:
+      type: string
+      description: Sport type
+      enum: [Football, Basketball, Baseball, Hockey, Soccer, Tennis, Golf, Other]
+      example: "Basketball"
+    league:
+      type: string
+      description: League
+      example: "NBA"
+    homeTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Los Angeles Lakers"
+        logo:
+          type: string
+          example: "https://via.placeholder.com/100?text=Lakers"
+      description: Home team information
+    awayTeam:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Golden State Warriors"
+        logo:
+          type: string
+          example: "https://via.placeholder.com/100?text=Warriors"
+      description: Away team information
+    venue:
+      type: string
+      description: Game venue
+      example: "Staples Center, Los Angeles"
+    startTime:
+      type: string
+      format: date-time
+      description: Scheduled start time
+      example: "2023-04-20T20:00:00Z"
+    endTime:
+      type: string
+      format: date-time
+      description: Scheduled end time
+      example: "2023-04-20T22:30:00Z"
+    status:
+      type: string
+      enum: [Scheduled, Live, Completed, Postponed, Canceled]
+      description: Game status
+      example: "Scheduled"
+    score:
+      type: object
+      properties:
+        home:
+          type: number
+          example: 0
+        away:
+          type: number
+          example: 0
+      description: Game score
+    highlights:
+      type: array
+      items:
+        type: string
+      description: Array of highlight URLs
+      example: []
+
+ScheduleRequest:
+  type: object
+  required:
+    - sport
+    - league
+    - homeTeam
+    - awayTeam
+    - venue
+    - startTime
+    - status
+  properties:
+    sport:
+      type: string
+      enum: [Football, Basketball, Baseball, Hockey, Soccer, Tennis, Golf, Other]
+    league:
+      type: string
+    homeTeam:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        logo:
+          type: string
+    awayTeam:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        logo:
+          type: string
+    venue:
+      type: string
+    startTime:
+      type: string
+      format: date-time
+    endTime:
+      type: string
+      format: date-time
+    status:
+      type: string
+      enum: [Scheduled, Live, Completed, Postponed, Canceled]
+    score:
+      type: object
+      properties:
+        home:
+          type: number
+        away:
+          type: number

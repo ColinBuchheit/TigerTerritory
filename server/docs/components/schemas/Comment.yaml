@@ -1,0 +1,42 @@
+Comment:
+  type: object
+  required:
+    - text
+    - user
+    - post
+  properties:
+    id:
+      type: string
+      description: Comment ID
+      example: "60d21b4667d0d8992e610c85"
+    text:
+      type: string
+      description: Comment text
+      example: "Great analysis! I think the key matchup will be in the backcourt."
+    user:
+      type: string
+      description: ID of the user who created the comment
+      example: "60d21b4667d0d8992e610c85"
+    post:
+      type: string
+      description: ID of the post this comment belongs to
+      example: "60d21b4667d0d8992e610c85"
+    likes:
+      type: array
+      items:
+        type: string
+      description: Array of user IDs who liked the comment
+    date:
+      type: string
+      format: date-time
+      description: Date when comment was created
+      example: "2023-04-16T14:30:00Z"
+
+CommentRequest:
+  type: object
+  required:
+    - text
+  properties:
+    text:
+      type: string
+      description: Comment text

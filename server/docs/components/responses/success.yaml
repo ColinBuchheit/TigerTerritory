@@ -1,0 +1,57 @@
+Success:
+  description: Successful operation
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: "Operation successful"
+          data:
+            type: object
+          timestamp:
+            type: string
+            format: date-time
+
+Created:
+  description: Resource created successfully
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: "Resource created successfully"
+          data:
+            type: object
+          timestamp:
+            type: string
+            format: date-time
+
+NoContent:
+  description: Operation successful, no content returned
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: "Resource deleted successfully"
+          data:
+            type: object
+            nullable: true
+          timestamp:
+            type: string
+            format: date-time
