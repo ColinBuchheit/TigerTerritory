@@ -64,11 +64,11 @@ const swaggerOptions = {
   },
   // Path to the API docs
   apis: [
-    path.join(__dirname, '../models/*.js'),     // Path to Models
-    path.join(__dirname, '../routes/*.js'),     // Path to Routes
-    path.join(__dirname, '../docs/components/schemas/*.yaml'), // Path to Swagger components
-    path.join(__dirname, '../docs/components/parameters/*.yaml'), // Path to Swagger parameters
-    path.join(__dirname, '../docs/components/responses/*.yaml')  // Path to Swagger responses
+    path.join(__dirname, '../models/*.js'),     
+    path.join(__dirname, '../routes/*.js'),     
+    path.join(__dirname, '../docs/components/schemas/*.yaml'), 
+    path.join(__dirname, '../docs/components/parameters/*.yaml'), 
+    path.join(__dirname, '../docs/components/responses/*.yaml')  
   ]
 };
 
