@@ -1,0 +1,18 @@
+<div class="hero-section">
+  <img src="assets/mizzou2.jpg" alt="Hero Image" class="hero-image">
+</div>
+
+<div class="calendar-section">
+  <h2>Upcoming Events</h2>
+  <div class="calendar">
+    <div class="calendar-header">
+      <span class="month">April 2025</span>
+    </div>
+    <div class="calendar-body">
+      <div *ngFor="let event of calendarEvents" class="calendar-day">
+        <span class="calendar-date">{{ event.date }}</span>
+        <span class="event">{{ event.event }}</span>
+      </div>
+    </div>
+  </div>
+</div>
