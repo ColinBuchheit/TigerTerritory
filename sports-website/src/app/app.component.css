@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: black;
+  color: white;
+}
+
+.header {
+  background-color: black;
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.header h1 {
+  color: gold;
+  font-size: 24px;
+  margin: 0;
+}
+
+.header nav a {
+  color: white;
+  margin-left: 16px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.header nav a:hover {
+  color: gold;
+}
+
+
