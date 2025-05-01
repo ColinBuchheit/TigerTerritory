@@ -1,3 +1,4 @@
+// Improved navigation.component.ts
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -18,6 +19,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   user: any = null;
   showProfileMenu = false;
+  isMobileMenuOpen = false;
+  hasNotifications = false; // Set to true when you have notifications to show
+  
   private authSubscription!: Subscription;
   private userSubscription!: Subscription;
 
@@ -55,17 +59,40 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   toggleProfileMenu(): void {
     this.showProfileMenu = !this.showProfileMenu;
+    if (this.showProfileMenu) {
+      this.isMobileMenuOpen = false; // Close mobile menu when opening profile menu
+    }
+  }
+  
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (this.isMobileMenuOpen) {
+      this.showProfileMenu = false; // Close profile menu when opening mobile menu
+    }
+  }
+  
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
   }
 
   // Close dropdown when clicking outside
   @HostListener('document:click', ['$event'])
   closeDropdown(event: MouseEvent): void {
+    // Handle profile menu
     if (this.showProfileMenu && 
         this.profileBtn && 
         this.profileMenu && 
         !this.profileBtn.nativeElement.contains(event.target) && 
         !this.profileMenu.nativeElement.contains(event.target)) {
       this.showProfileMenu = false;
+    }
+    
+    // Handle mobile menu close when clicking outside (optional)
+    const target = event.target as HTMLElement;
+    if (this.isMobileMenuOpen && 
+        !target.closest('.mobile-menu-toggle') && 
+        !target.closest('.main-nav')) {
+      this.isMobileMenuOpen = false;
     }
   }
 

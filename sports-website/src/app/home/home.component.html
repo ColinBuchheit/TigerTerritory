@@ -1,18 +1,85 @@
-<div class="hero-section">
-  <img src="assets/mizzou2.jpg" alt="Hero Image" class="hero-image">
-</div>
-
-<div class="calendar-section">
-  <h2>Upcoming Events</h2>
-  <div class="calendar">
-    <div class="calendar-header">
-      <span class="month">April 2025</span>
+<!-- home.component.html -->
+<section class="hero-section">
+  <div class="hero-container">
+    <img src="assets/mizzou2.jpg" alt="Mizzou Stadium" class="hero-image">
+    <div class="hero-overlay">
+      <h1>Tiger Territory</h1>
+      <p>Your home for Mizzou sports news and updates</p>
     </div>
-    <div class="calendar-body">
-      <div *ngFor="let event of calendarEvents" class="calendar-day">
-        <span class="calendar-date">{{ event.date }}</span>
-        <span class="event">{{ event.event }}</span>
+  </div>
+</section>
+
+<section class="intro-section">
+  <div class="container">
+    <h2>Welcome to Tiger Territory</h2>
+    <p>Stay updated with the latest news, schedules, and highlights from all Mizzou sports teams. Follow your favorite teams including Football, Basketball, Baseball, and Wrestling.</p>
+    
+    <div class="sports-categories">
+      <a routerLink="/football" class="category-card">
+        <img src="assets/foot.jpeg" alt="Football">
+        <span>Football</span>
+      </a>
+      <a routerLink="/basketball" class="category-card">
+        <img src="assets/basketball.jpeg" alt="Basketball">
+        <span>Basketball</span>
+      </a>
+      <a routerLink="/baseball" class="category-card">
+        <img src="assets/baseball.jpeg" alt="Baseball">
+        <span>Baseball</span>
+      </a>
+      <a routerLink="/wrestling" class="category-card">
+        <img src="assets/wrestling.jpeg" alt="Wrestling">
+        <span>Wrestling</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="calendar-section">
+  <div class="container">
+    <h2>Upcoming Events</h2>
+    
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <h3>{{ currentMonth }} {{ currentYear }}</h3>
+      </div>
+      
+      <div class="calendar-grid">
+        <div class="weekday-header" *ngFor="let day of weekdays">{{ day }}</div>
+        <div 
+          *ngFor="let day of calendarDays" 
+          class="calendar-day"
+          [class.current-month]="day.currentMonth"
+          [class.has-event]="day.hasEvent"
+          [class.today]="day.isToday"
+        >
+          <span class="day-number">{{ day.number }}</span>
+          <div class="day-events" *ngIf="day.hasEvent">
+            <div 
+              *ngFor="let event of day.events" 
+              class="event-indicator"
+              [style.backgroundColor]="getEventColor(event.type)"
+              [title]="event.title"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="upcoming-events">
+      <h3>This Month's Events</h3>
+      <div class="event-list">
+        <div class="event-item" *ngFor="let event of upcomingEvents">
+          <div class="event-date">
+            <span class="event-day">{{ getDay(event.date) }}</span>
+            <span class="event-month">{{ getMonth(event.date) }}</span>
+          </div>
+          <div class="event-details">
+            <h4>{{ event.event }}</h4>
+            <p>{{ event.time }} • {{ event.location }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</section>

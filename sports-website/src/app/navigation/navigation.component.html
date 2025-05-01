@@ -1,3 +1,4 @@
+<!-- Improved navigation.component.html -->
 <header class="header">
     <div class="container">
       <div class="logo-container">
@@ -5,20 +6,27 @@
         <h1 class="title">Tiger Territory</h1>
       </div>
       
-      <nav class="main-nav">
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        <a routerLink="/football" routerLinkActive="active">Football</a>
-        <a routerLink="/baseball" routerLinkActive="active">Baseball</a>
-        <a routerLink="/basketball" routerLinkActive="active">Basketball</a>
-        <a routerLink="/wrestling" routerLinkActive="active">Wrestling</a>
+      <!-- Mobile menu toggle -->
+      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <nav class="main-nav" [class.mobile-open]="isMobileMenuOpen">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()">Home</a>
+        <a routerLink="/football" routerLinkActive="active" (click)="closeMobileMenu()">Football</a>
+        <a routerLink="/baseball" routerLinkActive="active" (click)="closeMobileMenu()">Baseball</a>
+        <a routerLink="/basketball" routerLinkActive="active" (click)="closeMobileMenu()">Basketball</a>
+        <a routerLink="/wrestling" routerLinkActive="active" (click)="closeMobileMenu()">Wrestling</a>
       </nav>
       
       <div class="profile-container" *ngIf="isAuthenticated; else loginButton">
         <div class="profile-wrapper" (click)="toggleProfileMenu()" #profileBtn>
-          <div class="profile-avatar">
+          <div class="profile-avatar" [class.has-notifications]="hasNotifications">
             <!-- First letter of the user's name or default icon -->
             <span *ngIf="user?.name">{{ user.name.charAt(0) }}</span>
-            <i *ngIf="!user?.name" class="fas fa-user"></i>
+            <span *ngIf="!user?.name">U</span>
           </div>
         </div>
         
@@ -31,16 +39,16 @@
           </div>
           
           <div class="profile-menu-items">
-            <a routerLink="/profile" class="profile-menu-item">
-              <i class="fas fa-user-circle"></i>
+            <a routerLink="/profile" class="profile-menu-item" (click)="showProfileMenu = false">
+              <span class="icon">👤</span>
               <span>My Profile</span>
             </a>
-            <a routerLink="/settings" class="profile-menu-item">
-              <i class="fas fa-cog"></i>
+            <a routerLink="/settings" class="profile-menu-item" (click)="showProfileMenu = false">
+              <span class="icon">⚙️</span>
               <span>Settings</span>
             </a>
             <button class="profile-menu-item logout-btn" (click)="logout()">
-              <i class="fas fa-sign-out-alt"></i>
+              <span class="icon">🚪</span>
               <span>Sign Out</span>
             </button>
           </div>
@@ -49,7 +57,7 @@
       
       <ng-template #loginButton>
         <a routerLink="/auth" class="login-btn">
-          <i class="fas fa-sign-in-alt"></i>
+          <span class="icon">🔑</span>
           <span>Sign In</span>
         </a>
       </ng-template>
