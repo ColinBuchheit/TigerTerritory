@@ -1,0 +1,46 @@
+<div class="auth-card">
+    <form [formGroup]="authForm" (submit)="onSubmit()">
+
+        @if (mode == 'Create Account') { 
+            <input type="text" formControlName="username"> 
+            @if (authForm.get('username')?.invalid && authForm.get('username')?.touched) {
+                <div>
+                    @if (authForm.hasError('required', 'username')) { <p> Please enter username </p> }
+                </div>
+            }
+        }
+
+        <input type="email" formControlName="email">
+        @if (authForm.get('email')?.invalid && authForm.get('email')?.touched) {
+            <div>
+                @if (authForm.hasError('required', 'email')) { <p> Please enter email </p> }
+                @else if (authForm.hasError('email', 'email')) { <p> Email is invalid </p> }
+            </div>
+        }
+
+        <input type="password" formControlName="password">
+        @if (authForm.get('password')?.invalid && authForm.get('password')?.touched) {
+            <div>
+                @if (authForm.hasError('required', 'password')) { <p> Please enter password </p> }
+                @else if (authForm.hasError('minlength', 'password')) { <p> Password must contain 6+ characters </p> }
+            </div>
+        }
+
+        <button type="submit" [disabled]="!authForm.valid">Submit</button>
+
+        <div>
+            @switch (mode) {
+                @case ('Log In') { Dont have an account? }
+                @case ('Create Account') { Already have an account? }
+            }
+            <button (click)="swap()">{{mode}}</button>
+        </div>
+
+
+    </form>
+
+    
+        
+    
+</div>   
+ 
