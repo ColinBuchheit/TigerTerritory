@@ -1,35 +1,113 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: black;
-  color: white;
+/* Mizzou Tigers Colors */
+:root {
+  --mizzou-gold: #F1B82D;
+  --mizzou-black: #000000;
+  --mizzou-white: #FFFFFF;
+  --mizzou-gray: #333333;
+  --mizzou-light-gray: #E0E0E0;
 }
 
-.header {
-  background-color: black;
-  color: white;
-  padding: 16px;
+/* Main Content Area */
+.main-content {
+  min-height: calc(100vh - 70px - 250px); /* viewport height minus header and footer */
+  background-color: #f5f5f5;
+  padding: 20px 0;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: var(--mizzou-black);
+  color: var(--mizzou-white);
+  padding: 40px 0 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
+  flex-wrap: wrap;
+  margin-bottom: 30px;
 }
 
-.header h1 {
-  color: gold;
-  font-size: 24px;
+.footer-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.footer-img {
+  height: 50px;
+  width: auto;
+  margin-right: 10px;
+}
+
+.footer-title {
+  color: var(--mizzou-gold);
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.footer-section h3 {
+  color: var(--mizzou-gold);
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
 
-.header nav a {
-  color: white;
-  margin-left: 16px;
+.footer-section li {
+  margin-bottom: 8px;
+}
+
+.footer-section a {
+  color: var(--mizzou-white);
   text-decoration: none;
-  font-weight: bold;
+  font-size: 14px;
+  transition: color 0.3s;
 }
 
-.header nav a:hover {
-  color: gold;
+.footer-section a:hover {
+  color: var(--mizzou-gold);
 }
 
+.footer-bottom {
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
 
+.footer-bottom p {
+  color: #999;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

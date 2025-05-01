@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthModel } from './auth.model';
 import { AuthService } from './auth.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -15,13 +14,14 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule
   ],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css'
+  styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit {
   authForm!: FormGroup;
-  mode: string = 'Log In';
+  mode: 'login' | 'register' = 'login';
   isLoading = false;
   errorMessage: string | null = null;
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -37,33 +37,56 @@ export class AuthComponent implements OnInit {
     }
     
     // Initialize form
+    this.initializeForm();
+  }
+
+  initializeForm(): void {
     this.authForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+
+    if (this.mode === 'register') {
+      this.authForm.addControl('username', this.fb.control('', [Validators.required]));
+    }
+  }
+
+  toggleMode(): void {
+    this.errorMessage = null;
+    this.mode = this.mode === 'login' ? 'register' : 'login';
+    this.authForm.reset();
+    this.initializeForm();
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
     
-    // Disable username field initially since we start in login mode
-    this.authForm.get('username')?.disable();
+    // Find password input and toggle its type
+    const passwordInput = document.getElementById('password') as HTMLInputElement;
+    if (passwordInput) {
+      passwordInput.type = this.showPassword ? 'text' : 'password';
+    }
   }
 
   onSubmit(): void {
     if (this.authForm.invalid) {
+      // Mark all fields as touched to trigger validation messages
+      Object.keys(this.authForm.controls).forEach(key => {
+        this.authForm.get(key)?.markAsTouched();
+      });
       return;
     }
     
     this.isLoading = true;
     this.errorMessage = null;
-    
-    const isRegistration = this.mode === 'Create Account';
-    
-    const auth: AuthModel = {
+
+    const auth = {
       email: this.authForm.get('email')?.value,
-      username: isRegistration ? this.authForm.get('username')?.value : '',
+      username: this.mode === 'register' ? this.authForm.get('username')?.value : '',
       password: this.authForm.get('password')?.value
     };
     
-    this.authService.handleAuth(auth, isRegistration)
+    this.authService.handleAuth(auth, this.mode === 'register')
       .subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -80,18 +103,5 @@ export class AuthComponent implements OnInit {
           this.errorMessage = error.error?.message || 'Authentication failed. Please try again.';
         }
       });
-  }
-
-  swap(): void {
-    this.errorMessage = null;
-    
-    if (this.mode === 'Log In') {
-      this.mode = 'Create Account';
-      this.authForm.get('username')?.enable();
-    } else {
-      this.mode = 'Log In';
-      this.authForm.get('username')?.disable();
-      this.authForm.get('username')?.setValue('');
-    }
   }
 }

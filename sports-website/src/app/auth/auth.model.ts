@@ -2,13 +2,13 @@ export interface AuthModel {
     email: string;
     username: string;
     password: string;
-}
-
-export interface AuthResponse {
+  }
+  
+  export interface AuthResponse {
     success: boolean;
     message: string;
     data: {
-        token: string;
+      token: string;
     };
     timestamp: string;
-}
+  }

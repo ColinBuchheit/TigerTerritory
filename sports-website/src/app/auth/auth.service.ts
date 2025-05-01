@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthModel, AuthResponse } from './auth.model';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -11,15 +11,15 @@ export class AuthService {
   private apiUrl = 'http://localhost:5000/api/auth'; 
   private tokenExpirationTimer: any;
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
+  private userSubject = new BehaviorSubject<any>(null);
   
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  user$ = this.userSubject.asObservable();
 
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {
-    this.checkAuthStatus();
-  }
+  ) {}
 
   handleAuth(auth: AuthModel, isRegister: boolean): Observable<AuthResponse> {
     const endpoint = isRegister ? `${this.apiUrl}/register` : `${this.apiUrl}/login`;
@@ -38,6 +38,15 @@ export class AuthService {
         if (response.success && response.data.token) {
           this.handleAuthentication(response.data.token);
         }
+      }),
+      catchError(error => {
+        console.error('Authentication error:', error);
+        return of({
+          success: false,
+          message: error.error?.message || 'Authentication failed',
+          data: { token: '' },
+          timestamp: new Date().toISOString()
+        });
       })
     );
   }
@@ -45,11 +54,15 @@ export class AuthService {
   private handleAuthentication(token: string): void {
     localStorage.setItem('auth_token', token);
     
+    // Decode the token to get user information
     const tokenParts = token.split('.');
     if (tokenParts.length === 3) {
       try {
         const tokenPayload = JSON.parse(atob(tokenParts[1]));
         const expirationDate = new Date(tokenPayload.exp * 1000);
+        
+        // Store user info
+        this.userSubject.next(tokenPayload.user);
         
         this.setAutoLogout(expirationDate);
       } catch (e) {
@@ -58,6 +71,23 @@ export class AuthService {
     }
     
     this.isAuthenticatedSubject.next(true);
+  }
+  
+  getCurrentUser(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/me`).pipe(
+      tap(response => {
+        if (response) {
+          this.userSubject.next(response);
+        }
+      }),
+      catchError(error => {
+        console.error('Error fetching user profile:', error);
+        if (error.status === 401) {
+          this.logout();
+        }
+        return of(null);
+      })
+    );
   }
   
   private setAutoLogout(expirationDate: Date): void {
@@ -98,8 +128,13 @@ export class AuthService {
             const tokenPayload = JSON.parse(atob(tokenParts[1]));
             const expirationDate = new Date(tokenPayload.exp * 1000);
             
+            // Update user info
+            this.userSubject.next(tokenPayload.user);
+            
             if (expirationDate > new Date()) {
               this.setAutoLogout(expirationDate);
+              // Fetch current user data
+              this.getCurrentUser().subscribe();
             } else {
               this.logout();
             }
@@ -123,6 +158,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('auth_token');
     this.isAuthenticatedSubject.next(false);
+    this.userSubject.next(null);
     
     if (this.tokenExpirationTimer) {
       clearTimeout(this.tokenExpirationTimer);

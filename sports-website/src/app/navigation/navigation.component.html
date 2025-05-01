@@ -1,0 +1,57 @@
+<header class="header">
+    <div class="container">
+      <div class="logo-container">
+        <img src="assets/tiger-logo.png" alt="Mizzou Tigers Logo" class="logo">
+        <h1 class="title">Tiger Territory</h1>
+      </div>
+      
+      <nav class="main-nav">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/football" routerLinkActive="active">Football</a>
+        <a routerLink="/baseball" routerLinkActive="active">Baseball</a>
+        <a routerLink="/basketball" routerLinkActive="active">Basketball</a>
+        <a routerLink="/wrestling" routerLinkActive="active">Wrestling</a>
+      </nav>
+      
+      <div class="profile-container" *ngIf="isAuthenticated; else loginButton">
+        <div class="profile-wrapper" (click)="toggleProfileMenu()" #profileBtn>
+          <div class="profile-avatar">
+            <!-- First letter of the user's name or default icon -->
+            <span *ngIf="user?.name">{{ user.name.charAt(0) }}</span>
+            <i *ngIf="!user?.name" class="fas fa-user"></i>
+          </div>
+        </div>
+        
+        <div class="profile-dropdown" *ngIf="showProfileMenu" #profileMenu>
+          <div class="profile-header">
+            <div class="profile-info">
+              <h3 class="profile-name">{{ user?.name || 'User' }}</h3>
+              <p class="profile-email">{{ user?.email || 'Loading...' }}</p>
+            </div>
+          </div>
+          
+          <div class="profile-menu-items">
+            <a routerLink="/profile" class="profile-menu-item">
+              <i class="fas fa-user-circle"></i>
+              <span>My Profile</span>
+            </a>
+            <a routerLink="/settings" class="profile-menu-item">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+            <button class="profile-menu-item logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <ng-template #loginButton>
+        <a routerLink="/auth" class="login-btn">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Sign In</span>
+        </a>
+      </ng-template>
+    </div>
+  </header>
