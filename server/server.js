@@ -47,6 +47,11 @@ server.on('error', (error) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Sports Website API is running...');
+});
+
+
 server.on('listening', () => {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;

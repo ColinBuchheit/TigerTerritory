@@ -10,28 +10,23 @@ import { authGuard } from './auth/auth.guard';
 export const routes: Routes = [
   { 
     path: '', 
-    component: HomeComponent,
-    canActivate: [authGuard]
+    component: HomeComponent
   },
   { 
     path: 'football', 
-    component: FootballComponent,
-    canActivate: [authGuard]
+    component: FootballComponent
   },
   { 
     path: 'baseball', 
-    component: BaseballComponent,
-    canActivate: [authGuard]
+    component: BaseballComponent
   },
   { 
     path: 'basketball', 
-    component: BasketballComponent,
-    canActivate: [authGuard]
+    component: BasketballComponent
   },
   { 
     path: 'wrestling', 
-    component: WrestlingComponent,
-    canActivate: [authGuard]
+    component: WrestlingComponent
   },
   { 
     path: 'auth', 

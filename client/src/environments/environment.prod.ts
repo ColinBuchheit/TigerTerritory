@@ -1,4 +1,4 @@
 export const environment = {
-    production: true,
-    apiUrl: '/api' 
-  };
+  production: true,
+  apiUrl: 'https://tiger-territory.onrender.com/api'
+};

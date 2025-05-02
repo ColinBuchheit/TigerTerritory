@@ -80,15 +80,15 @@ exports.getCommentsByPost = asyncHandler(async (req, res) => {
     id: comment._id,
     text: comment.text,
     postId: comment.postId,
-    author: comment.user.name,
-    authorEmail: comment.user.email,
+    author: comment.user ? comment.user.name : 'Anonymous',
+    authorEmail: comment.user ? comment.user.email : '',
     date: comment.date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     }),
-    user: comment.user._id,
-    likes: comment.likes.length
+    user: comment.user ? comment.user._id : null,
+    likes: comment.likes && Array.isArray(comment.likes) ? comment.likes.length : 0
   }));
   
   const paginationInfo = {
@@ -166,45 +166,3 @@ exports.deleteComment = asyncHandler(async (req, res) => {
   res.json(formatResponse(true, 'Comment deleted successfully', {}));
 });
 
-/**
- * @desc    Like a comment
- * @route   PUT /api/comments/:id/like
- * @access  Private
- */
-exports.likeComment = asyncHandler(async (req, res) => {
-  const comment = await Comment.findById(req.params.id);
-  
-  if (checkResourceNotFound(comment, res, 'Comment')) return;
-  
-  // Check if comment has already been liked by this user
-  if (comment.likes.some(like => like.toString() === req.user.id)) {
-    return res.status(400).json(formatResponse(false, 'Comment already liked', null));
-  }
-  
-  comment.likes.unshift(req.user.id);
-  await comment.save();
-  
-  res.json(formatResponse(true, 'Comment liked successfully', { likeCount: comment.likes.length }));
-});
-
-/**
- * @desc    Unlike a comment
- * @route   PUT /api/comments/:id/unlike
- * @access  Private
- */
-exports.unlikeComment = asyncHandler(async (req, res) => {
-  const comment = await Comment.findById(req.params.id);
-  
-  if (checkResourceNotFound(comment, res, 'Comment')) return;
-  
-  // Check if comment has been liked by this user
-  if (!comment.likes.some(like => like.toString() === req.user.id)) {
-    return res.status(400).json(formatResponse(false, 'Comment has not yet been liked', null));
-  }
-  
-  // Remove user from likes array
-  comment.likes = comment.likes.filter(like => like.toString() !== req.user.id);
-  await comment.save();
-  
-  res.json(formatResponse(true, 'Comment unliked successfully', { likeCount: comment.likes.length }));
-});

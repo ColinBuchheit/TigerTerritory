@@ -174,35 +174,6 @@ router.delete('/:id', auth, commentController.deleteComment);
  *       500:
  *         description: Server error
  */
-router.put('/:id/like', auth, commentController.likeComment);
 
-/**
- * @swagger
- * /api/comments/{id}/unlike:
- *   put:
- *     summary: Unlike a comment
- *     tags: [Comments]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Comment ID
- *     responses:
- *       200:
- *         description: Comment unliked successfully
- *       400:
- *         description: Comment has not yet been liked
- *       401:
- *         description: Not authorized
- *       404:
- *         description: Comment not found
- *       500:
- *         description: Server error
- */
-router.put('/:id/unlike', auth, commentController.unlikeComment);
 
 module.exports = router;
