@@ -1,4 +1,4 @@
-<!-- home.component.html -->
+<!-- Hero Section -->
 <section class="hero-section">
   <div class="hero-container">
     <img src="assets/mizzou2.jpg" alt="Mizzou Stadium" class="hero-image">
@@ -9,6 +9,7 @@
   </div>
 </section>
 
+<!-- Intro Section -->
 <section class="intro-section">
   <div class="container">
     <h2>Welcome to Tiger Territory</h2>
@@ -35,13 +36,14 @@
   </div>
 </section>
 
+<!-- Calendar Section -->
 <section class="calendar-section">
   <div class="container">
-    <h2>Upcoming Events</h2>
+    <h2>{{currentMonth}} {{currentYear}} Sports Schedule</h2>
     
     <div class="calendar-container">
       <div class="calendar-header">
-        <h3>{{ currentMonth }} {{ currentYear }}</h3>
+        <h3>{{currentMonth}} {{currentYear}}</h3>
       </div>
       
       <div class="calendar-grid">
@@ -59,24 +61,49 @@
               *ngFor="let event of day.events" 
               class="event-indicator"
               [style.backgroundColor]="getEventColor(event.type)"
-              [title]="event.title"
-            ></div>
+              [title]="event.title + ' - ' + event.time + ' - ' + event.location"
+            >
+              <span class="event-title">{{event.title}}</span>
+              <span class="event-time">{{event.time}}</span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="calendar-legend">
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #E53935;"></span>
+          <span>Football</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #1E88E5;"></span>
+          <span>Basketball</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #43A047;"></span>
+          <span>Baseball</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background-color: #FB8C00;"></span>
+          <span>Wrestling</span>
         </div>
       </div>
     </div>
     
+    <!-- Upcoming Events Section -->
     <div class="upcoming-events">
-      <h3>This Month's Events</h3>
+      <h3>This Month's Upcoming Games</h3>
       <div class="event-list">
         <div class="event-item" *ngFor="let event of upcomingEvents">
-          <div class="event-date">
+          <div class="event-date" [style.backgroundColor]="getEventColor(event.type)">
             <span class="event-day">{{ getDay(event.date) }}</span>
             <span class="event-month">{{ getMonth(event.date) }}</span>
           </div>
           <div class="event-details">
-            <h4>{{ event.event }}</h4>
+            <h4>{{ event.title }}</h4>
             <p>{{ event.time }} • {{ event.location }}</p>
+            <p *ngIf="event.venue">{{ event.venue }}</p>
           </div>
         </div>
       </div>

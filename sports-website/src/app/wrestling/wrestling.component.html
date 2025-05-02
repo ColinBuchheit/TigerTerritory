@@ -1,7 +1,112 @@
-<div class="articles">
-  <div class="article-card" *ngFor="let article of articles">
-    <img [src]="article.imageUrl" alt="Article Image" />
-    <h3>{{ article.title }}</h3>
-    <p>{{ article.summary }}</p>
+<section class="page-header">
+  <div class="container">
+    <h1 class="page-title">Mizzou Wrestling</h1>
+    <p class="page-subtitle">Follow the latest Tigers wrestling news and updates</p>
   </div>
-</div>
+</section>
+
+<section class="articles-section">
+  <div class="container">
+    <div class="articles-grid">
+      <!-- Loop through articles -->
+      <article class="article-card" *ngFor="let article of articles; let i = index">
+        <!-- Article Image with Fixed Aspect Ratio -->
+        <div class="article-image-container">
+          <div class="image-wrapper">
+            <img [src]="article.imageUrl" [alt]="article.title" class="article-image" [ngClass]="{'loaded': imageLoaded[i]}" (load)="onImageLoad(i)">
+            <div class="image-loader" *ngIf="!imageLoaded[i]"></div>
+          </div>
+          <span class="article-category">{{article.category || 'Wrestling'}}</span>
+        </div>
+        
+        <!-- Article Content -->
+        <div class="article-content">
+          <div class="article-meta">
+            <span class="article-date">{{ article.date || 'May 1, 2025' }}</span>
+          </div>
+          <h2 class="article-title">{{article.title}}</h2>
+          <p class="article-excerpt">{{article.summary}}</p>
+          
+          <!-- Interaction Buttons -->
+          <div class="article-actions">
+            <button class="action-button read-button" (click)="toggleArticle(i)">
+              <span *ngIf="expandedArticle !== i">Read More</span>
+              <span *ngIf="expandedArticle === i">Show Less</span>
+            </button>
+            <button class="action-button comment-button" (click)="toggleComments(i)">
+              <span>Comments ({{getCommentCount(i)}})</span>
+            </button>
+          </div>
+          
+          <!-- Expanded Content -->
+          <div class="expanded-content" [class.expanded]="expandedArticle === i">
+            <div class="expanded-text">
+              <p *ngFor="let paragraph of article.content">{{paragraph}}</p>
+            </div>
+          </div>
+          
+          <!-- Comments Section -->
+          <div class="comments-section" [class.expanded]="activeCommentSection === i">
+            <h3 class="comments-header">Comments</h3>
+            
+            <!-- Loading Indicator -->
+            <div class="comments-loading" *ngIf="isLoadingComments">
+              <div class="loader"></div>
+              <p>Loading comments...</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="comments-error" *ngIf="commentError">
+              <p>{{commentError}}</p>
+            </div>
+            
+            <!-- Comments List -->
+            <div class="comments-list" *ngIf="!isLoadingComments && !commentError && getCommentCount(i) > 0">
+              <div class="comment-item" *ngFor="let comment of getArticleComments(i)">
+                <div class="comment-avatar" [style.backgroundColor]="getAvatarColor(comment.author || '', comment.authorEmail)">
+                  <span>{{(comment.author || '?').charAt(0).toUpperCase()}}</span>
+                </div>
+                <div class="comment-body">
+                  <div class="comment-header">
+                    <span class="comment-author">{{comment.author || 'Anonymous'}}</span>
+                    <span class="comment-date">{{comment.date}}</span>
+                  </div>
+                  <p class="comment-text">{{comment.text}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- No Comments Message -->
+            <div class="no-comments" *ngIf="!isLoadingComments && !commentError && getCommentCount(i) === 0">
+              <p>Be the first to comment on this article!</p>
+            </div>
+            
+            <!-- Comment Form -->
+            <div class="comment-form">
+              <h4 class="form-title">Add Your Comment</h4>
+              <div class="form-group">
+                <textarea 
+                  placeholder="Write your thoughts here..." 
+                  [(ngModel)]="newComments[i]"
+                  class="comment-textarea"
+                  [class.active]="hasCommentText(i)"
+                ></textarea>
+              </div>
+              <button 
+                class="submit-button" 
+                [disabled]="!hasCommentText(i) || !isUserLoggedIn()"
+                [class.active]="hasCommentText(i) && isUserLoggedIn()"
+                (click)="addComment(i)"
+              >
+                Post Comment
+              </button>
+              <p class="login-prompt" *ngIf="!isUserLoggedIn()">
+                Please <a routerLink="/auth">sign in</a> to leave a comment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

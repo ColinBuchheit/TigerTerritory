@@ -1,4 +1,3 @@
-// home.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -10,16 +9,20 @@ interface CalendarDay {
   hasEvent: boolean;
   events?: Array<{
     title: string;
-    type: string;
+    time: string;
+    location: string;
+    venue?: string;
+    type: string; // e.g., 'baseball', 'basketball', etc.
   }>;
 }
 
 interface Event {
   date: string;
-  event: string;
+  title: string;
   time: string;
   location: string;
-  type: string; // e.g., 'football', 'basketball', etc.
+  venue?: string;
+  type: string;
 }
 
 @Component({
@@ -36,50 +39,163 @@ export class HomeComponent implements OnInit {
   currentMonth: string = '';
   currentYear: number = 0;
   
-  // Events data
-  upcomingEvents: Event[] = [
-    {
-      date: '2025-04-25',
-      event: 'Football Game',
-      time: '2:00 PM',
-      location: 'Faurot Field',
-      type: 'football'
+  // Events data for calendar
+  sportsEvents: Event[] = [
+    { 
+      date: '2025-05-02', 
+      title: 'Baseball vs Georgia', 
+      time: '6 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
     },
-    {
-      date: '2025-04-26',
-      event: 'Basketball Practice',
-      time: '10:00 AM',
-      location: 'Mizzou Arena',
-      type: 'basketball'
+    { 
+      date: '2025-05-03', 
+      title: 'Baseball vs Georgia', 
+      time: '7 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
     },
-    {
-      date: '2025-04-27',
-      event: 'Wrestling Tournament',
-      time: '9:00 AM',
-      location: 'Hearnes Center',
-      type: 'wrestling'
+    { 
+      date: '2025-05-04', 
+      title: 'Baseball vs Georgia', 
+      time: '1 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM', 
+      type: 'baseball' 
     },
-    {
-      date: '2025-05-02',
-      event: 'Baseball vs. Alabama',
-      time: '3:30 PM',
-      location: 'Taylor Stadium',
-      type: 'baseball'
+    { 
+      date: '2025-05-06', 
+      title: 'Baseball vs Kansas', 
+      time: '6 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-09', 
+      title: 'Baseball at Texas A&M', 
+      time: '6 p.m.', 
+      location: 'College Station, Texas', 
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-10', 
+      title: 'Baseball at Texas A&M', 
+      time: '2 p.m.', 
+      location: 'College Station, Texas', 
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-11', 
+      title: 'Baseball at Texas A&M', 
+      time: '1 p.m.', 
+      location: 'College Station, Texas', 
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-15', 
+      title: 'Baseball vs Mississippi State', 
+      time: '6 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-16', 
+      title: 'Baseball vs Mississippi State', 
+      time: '6 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-17', 
+      title: 'Baseball vs Mississippi State', 
+      time: '2 p.m.', 
+      location: 'Columbia, Mo.', 
+      venue: 'TAYLOR STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-20', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-21', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-22', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-23', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-24', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-25', 
+      title: 'Baseball vs TBA (SEC Tournament)', 
+      time: 'TBA', 
+      location: 'Hoover, Ala.', 
+      venue: 'HOOVER METROPOLITAN STADIUM',
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-30', 
+      title: 'Baseball vs TBA (NCAA Regional)', 
+      time: 'TBA', 
+      location: 'TBA', 
+      type: 'baseball' 
+    },
+    { 
+      date: '2025-05-31', 
+      title: 'Baseball vs TBA (NCAA Regional)', 
+      time: 'TBA', 
+      location: 'TBA', 
+      type: 'baseball' 
     }
   ];
+  
+  // Events for upcoming events section
+  upcomingEvents: Event[] = [];
 
   constructor() {}
 
   ngOnInit(): void {
-    this.generateCalendar();
+    this.generateCalendar(4, 2025); // May 2025 (0-indexed month)
+    this.getUpcomingEvents();
   }
 
-  generateCalendar(): void {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    
-    this.currentMonth = today.toLocaleString('default', { month: 'long' });
+  generateCalendar(month: number, year: number): void {
+    // Reset calendar days
+    this.calendarDays = [];
+    this.currentMonth = new Date(year, month).toLocaleString('default', { month: 'long' });
     this.currentYear = year;
     
     // First day of month
@@ -88,53 +204,62 @@ export class HomeComponent implements OnInit {
     const lastDay = new Date(year, month + 1, 0);
     
     // Days from previous month
-    const daysFromPrevMonth = firstDay.getDay();
+    const daysFromPrevMonth = firstDay.getDay(); // 0 = Sunday, 6 = Saturday
     for (let i = daysFromPrevMonth; i > 0; i--) {
       const prevDate = new Date(year, month, -i + 1);
+      const dateStr = this.formatDate(prevDate);
+      
+      // Get events for this day
+      const dayEvents = this.sportsEvents.filter(event => event.date === dateStr);
+      
       this.calendarDays.push({
         number: prevDate.getDate(),
         currentMonth: false,
-        isToday: false,
-        hasEvent: false
+        isToday: this.isToday(prevDate),
+        hasEvent: dayEvents.length > 0,
+        events: dayEvents
       });
     }
     
     // Days of current month
     for (let i = 1; i <= lastDay.getDate(); i++) {
       const date = new Date(year, month, i);
-      const dateString = this.formatDate(date);
+      const dateStr = this.formatDate(date);
       
-      // Check if this day has events
-      const todayEvents = this.upcomingEvents.filter(event => 
-        event.date === dateString
-      );
+      // Get events for this day
+      const dayEvents = this.sportsEvents.filter(event => event.date === dateStr);
       
       this.calendarDays.push({
         number: i,
         currentMonth: true,
         isToday: this.isToday(date),
-        hasEvent: todayEvents.length > 0,
-        events: todayEvents.map(e => ({
-          title: e.event,
-          type: e.type
-        }))
+        hasEvent: dayEvents.length > 0,
+        events: dayEvents
       });
     }
     
     // Days from next month
     const daysFromNextMonth = 42 - this.calendarDays.length; // 6 rows * 7 days = 42
     for (let i = 1; i <= daysFromNextMonth; i++) {
+      const nextDate = new Date(year, month + 1, i);
+      const dateStr = this.formatDate(nextDate);
+      
+      // Get events for this day
+      const dayEvents = this.sportsEvents.filter(event => event.date === dateStr);
+      
       this.calendarDays.push({
         number: i,
         currentMonth: false,
-        isToday: false,
-        hasEvent: false
+        isToday: this.isToday(nextDate),
+        hasEvent: dayEvents.length > 0,
+        events: dayEvents
       });
     }
   }
   
   isToday(date: Date): boolean {
-    const today = new Date();
+    // For demo purposes, let's assume today is May 1, 2025 to match with the website date
+    const today = new Date(2025, 4, 1); // May 1, 2025
     return date.getDate() === today.getDate() &&
            date.getMonth() === today.getMonth() &&
            date.getFullYear() === today.getFullYear();
@@ -165,5 +290,21 @@ export class HomeComponent implements OnInit {
   getMonth(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleString('default', { month: 'short' });
+  }
+  
+  getUpcomingEvents(): void {
+    // Create a date for May 1, 2025
+    const currentDate = new Date(2025, 4, 1);
+    // Filter to get upcoming events (next two weeks)
+    const twoWeeksLater = new Date(currentDate);
+    twoWeeksLater.setDate(twoWeeksLater.getDate() + 14);
+    
+    this.upcomingEvents = this.sportsEvents
+      .filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate >= currentDate && eventDate <= twoWeeksLater;
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 4); // Limit to 4 upcoming events
   }
 }
