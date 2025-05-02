@@ -2,29 +2,28 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
-import { CommentService, Comment as CommentModel } from '../services/comment.service';
+import { AuthService } from '../../services/auth.service';
+import { CommentService, Comment as CommentModel } from '../../services/comment.service';
 import { Subscription } from 'rxjs';
 
 interface Article {
-  id: number;
   title: string;
   imageUrl: string;
-  excerpt: string;
+  summary: string;
   content: string[];
-  date: string;
-  category: string;
+  date?: string;
+  category?: string;
   postId: string; // Identifier for the backend
 }
 
 @Component({
-  selector: 'app-football',
-  templateUrl: './football.component.html',
-  styleUrls: ['./football.component.css'],
+  selector: 'app-wrestling',
+  templateUrl: './wrestling.component.html',
+  styleUrls: ['./wrestling.component.css'],
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule]
 })
-export class FootballComponent implements OnInit, OnDestroy {
+export class WrestlingComponent implements OnInit, OnDestroy {
   expandedArticle: number | null = null;
   activeCommentSection: number | null = null;
   newComments: string[] = [];
@@ -34,63 +33,68 @@ export class FootballComponent implements OnInit, OnDestroy {
   commentError: string | null = null;
   private subscriptions: Subscription[] = [];
   
-  // Sample articles data with postId for backend
+  // Modified articles data with postId for backend integration
   articles: Article[] = [
     {
-      id: 0,
-      title: 'No. 21 Missouri Retains Battle Line Rivalry Trophy with 28-21 victory over Arkansas',
-      imageUrl: 'assets/drink.jpeg',
-      excerpt: 'COLUMBIA, Mo. - No. 21 Missouri turned two fumbles - both forced by Johnny Walker Jr. - into touchdowns and Marcus Carroll ran for 90 yards and two touchdowns to spark a 28-21 victory over Arkansas in the Battle Line Rivalry, sponsored by Shelter Insurance.',
+      title: 'Mizzou wrestling lands transfer portal, high school commits',
+      imageUrl: '/assets/wres.jpeg',
+      summary: 'Mizzou wrestling lost a lot of crucial senior experience toward the top of its roster this offseason, but the Tigers are already reloading their roster via the transfer portal.',
       content: [
-        'With the victory, Missouri (9-3, 5-3) retained the Battle Line Trophy for the eighth time in the last nine years – including the last three – and kept Arkansas (6-6, 3-5) winless in Columbia (0-7).',
-        'On a cold and snowy day, Missouri won its 10th straight home game, completed its first 7-0 home season and posted its first back-to-back nine-win seasons since 2013-14.',
-        'Missouri\'s defense forced three Arkansas turnovers, converting Walker\'s two forced fumbles into touchdown drives. Mizzou trailed twice in the game – including 14-7 at halftime – but forged ahead for good on an 11-yard rushing score by Carroll with 11:43 to play that capped a 12-play, 77-yard drive.'
+        'Mizzou wrestling lost a lot of crucial senior experience toward the top of its roster this offseason. Five-time All-American Keegan OToole is out of eligibility, and senior Rocky Elam announced his transfer to Iowa State on Tuesday.',
+        'However, the Tigers are already reloading their roster via the transfer portal. They landed a commitment from three-time NCAA qualifier Maxx Mayfield on Wednesday night. Mayfield previously wrestled at Northwestern and competed in the 165-pound division. He will be using his final season of eligibility at Mizzou.',
+        'The Lincoln, Nebraska, product went 21-12 during his senior season at Northwestern. He had two victories during the NCAA Tournament this season, the first a 7-6 decision over Arizona State\'s Nico Ruiz and then a 3-2 tiebreaker over Central Michigan\'s Chandler Amaker.',
+        'On Dec. 29, Mayfield defeated Mizzou redshirt junior Jeremy Jakowitsch by fall in 1 minute, 55 seconds.',
+        'Mizzou also secured commitments from two highly-touted high school wrestlers, including four-star prospect Trey Crawford from Oklahoma and Illinois state champion Giovanni Cassioppi.'
       ],
-      date: 'May 1, 2025',
-      category: 'Game Recap',
-      postId: 'football-news-1'
-    },
-    {
-      id: 1,
-      title: 'Mizzou football grabs an offensive lineman out of the portal',
-      imageUrl: 'assets/luther.jpeg',
-      excerpt: 'Mizzou football coach Eli Drinkwitz has used the spring transfer window to make three new additions to his roster, so far, ahead of the 2025 campaign. On Tuesday, the Tigers gained a commitment from former Florida State offensive lineman Jaylen Early, who will come into Columbia with two years of eligibility.',
-      content: [
-        'The 6-foot-4, 305-pound lineman started in seven games through 17 appearances for the Seminoles. He played a role in a Florida State offense that averaged 4.4 yards per play and 270.3 yards per game, despite the struggles of a 2-10 season in 2024.',
-        'The Duncanville, Texas native came out of high school as a consensus four-star prospect, as ESPN tabbed him as the No. 6 offensive guard in the nation and 48th overall prospect from Texas. He played both tackle and guard during his four years at Duncanville High School, where his team reached the 6A D1 state championship game in 2021.',
-        'In his senior season, the Panthers averaged 47.4 points per game.'
-      ],
-      date: 'April 28, 2025',
+      date: 'April 24, 2025',
       category: 'Recruitment',
-      postId: 'football-news-2'
+      postId: 'wrestling-news-1'
     },
     {
-      id: 2,
-      title: 'No. 7 Missouri opens SEC play with 30-27 Double OT win vs. Vanderbilt',
-      imageUrl: 'assets/foot.jpeg',
-      excerpt: 'COLUMBIA, Mo. – A 25-yard touchdown pass from Brady Cook to Luther Burden III and a 37-yard field by Blake Craig allowed the No. 7 Missouri Tigers (4-0, 1-0) to prevail in double overtime, 30-27, against the Vanderbilt Commodores (2-2, 0-1) in the Southeastern Conference opener for both teams.',
+      title: 'Wrestling Finishes NCAA Championships with Two All-Americans',
+      imageUrl: 'assets/mat.jpeg',
+      summary: 'PHILADELPHIA – No. 25 University of Missouri wrestling closed out the final day of the NCAA Wrestling Championships in 14th place with 32 points. Missouri put two wrestlers on the podium.',
       content: [
-        'The victory was not secured until Vanderbilt\'s Brock Taylor missed a 31-yard field goal that he hooked left from the right hash mark on the Commodores\' second OT possession.',
-        'With the win, Mizzou extended its winning streak to eight games, the nation\'s longest, and the longest for the Tigers since a 13-game streak spanned the 1960 and 1961 seasons.',
-        'Brady Cook completed 27-of-39 passes for 395 yards and two touchdowns. He has now thrown 218 consecutive passes without an interception, a school record.'
+        'PHILADELPHIA – No. 25 University of Missouri wrestling closed out the final day of the NCAA Wrestling Championships on March 22 at Wells Fargo Center in 14th place with 32 points.',
+        'Missouri put two wrestlers on the podium, with redshirt sophomore Cam Steed placing seventh and senior Keegan OToole placing second.',
+        'OToole, who entered the tournament as the No. 1 seed at 165 pounds, fell in a hard-fought championship match to Penn State\'s Mitchell Mesenbrink by a 7-5 decision. OToole finishes his illustrious Missouri career as a five-time All-American with one NCAA title.',
+        'Steed, seeded 10th at 141 pounds, battled back through the consolation bracket after a quarterfinal loss to earn his first All-American honor. He defeated Nebraska\'s Brock Hardy 6-3 in the seventh-place match.',
+        'The Tigers 14th place finish marks their 12th consecutive year finishing in the top 15 at the NCAA Championships under head coach Brian Smith.'
       ],
-      date: 'April 15, 2025',
-      category: 'Game Recap',
-      postId: 'football-news-3'
+      date: 'March 23, 2025',
+      category: 'Tournament',
+      postId: 'wrestling-news-2'
     },
     {
-      id: 3,
-      title: 'No. 23 Missouri rallies from 10 down, beats Iowa 27-24 in the Music City Bowl',
-      imageUrl: 'assets/cody.jpeg',
-      excerpt: 'NASHVILLE, Tenn. -- — Blake Craig kicked two field goals in the fourth quarter, his second a 56-yarder with 4:36 left as No. 23 Missouri rallied to beat Iowa 27-24 on Monday in the Music City Bowl. Missouri trailed 24-14 when the Tigers started the comeback, scoring the final 13 points for the win.',
+      title: 'No. 20 Wrestling Falls to No. 3 Oklahoma State',
+      imageUrl: 'assets/rest.jpeg',
+      summary: 'STILLWATER, Okla. – No. 20 University of Missouri wrestling fell to No. 3 Oklahoma State 36-3 on Sunday. The Tigers dropped to 0-2 on their weekend road trip to the Sooner State.',
       content: [
-        'Brady Cook threw for 287 yards and two touchdowns. Joshua Manning also ran for a TD to key the comeback. Marquis Johnson added 122 yards receiving and a TD catch. Missouri (10-3) posted the program\'s eighth 10-win season.',
-        'Coach Eli Drinkwitz said the win total is only a piece, with the Tigers starting and finishing the season ranked a great accomplishment for his seniors.',
-        '"It\'s something that they should take a lot of pride in back-to-back seasons," Drinkwitz said. "Finishing ranked is an unbelievable accomplishment for our program and really, really proud of them."'
+        'STILLWATER, Okla. – No. 20 University of Missouri wrestling fell to No. 3 Oklahoma State 36-3 on Sunday. The Tigers dropped to 0-2 on their weekend road trip to the Sooner State.',
+        'Mizzou now sits at 5-9 (4-3 Big 12) on the season, while Oklahoma State remains undefeated at 12-0 (9-0 Big 12).',
+        'TIGERS TOP PERFORMER: Keegan OToole earned Missouri\'s lone victory of the dual with a 7-3 decision over Izzak Olejnik at 165 pounds. The win improved OToole to 18-0 on the season with six major decisions, five technical falls and two pins.',
+        'The Cowboys won the other nine bouts, including two by fall, two by technical fall and three by major decision.',
+        'Missouri will return home for their final regular season dual meet of the year, hosting Northern Iowa on Saturday, February 24, for Senior Day.'
       ],
-      date: 'April 10, 2025',
-      category: 'Bowl Game',
-      postId: 'football-news-4'
+      date: 'February 18, 2025',
+      category: 'Dual Meet',
+      postId: 'wrestling-news-3'
+    },
+    {
+      title: 'Tiger Style Wrestling Takes on 2025 U.S. Open',
+      imageUrl: 'assets/wrestling.jpeg',
+      summary: 'COLUMBIA, Mo. – University of Missouri wrestling will have four competitors in the 2025 U.S. Open competing under Tiger Style Wrestling Club at The Expo at World Market Center in Las Vegas.',
+      content: [
+        'COLUMBIA, Mo. – University of Missouri wrestling will have four competitors in the 2025 U.S. Open competing under Tiger Style Wrestling Club at The Expo at World Market Center in Las Vegas.',
+        'The U20 division will take place on April 25-26, with the Senior division competition being held on April 26-27.',
+        'Mack Mauger (57kg) and Jarrett Stoner (125kg) will be competing for a U20 freestyle crown, while Jarrett Jacques (74kg) will return to Senior-level competition.',
+        'Aeoden Sinclair will be doubling up for the weekend, competing at both the U20 and Senior levels. Winners of each Senior-level weight class will earn a spot in Final X on June 14, one step closer to making a Senior World Team.',
+        'For the U20 division, a high finish will qualify wrestlers for the World Team Trials from May 30 to June 1.',
+        'Jacques, a former four-time NCAA qualifier for the Tigers (2019-22), earned a fourth-place finish at the 2023 U.S. Open and will be looking to improve upon that result this year.'
+      ],
+      date: 'April 20, 2025',
+      category: 'U.S. Open',
+      postId: 'wrestling-news-4'
     }
   ];
   

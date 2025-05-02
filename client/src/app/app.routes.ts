@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { FootballComponent } from './football/football.component';
-import { BaseballComponent } from './baseball/baseball.component';
-import { BasketballComponent } from './basketball/basketball.component';
-import { WrestlingComponent } from './wrestling/wrestling.component';
+import { HomeComponent } from './pages/home/home.component';
+import { FootballComponent } from './pages/football/football.component';
+import { BaseballComponent } from './pages/baseball/baseball.component';
+import { BasketballComponent } from './pages/basketball/basketball.component';
+import { WrestlingComponent } from './pages/wrestling/wrestling.component';
 import { AuthComponent } from './auth/auth.component';
 import { authGuard } from './auth/auth.guard';
 

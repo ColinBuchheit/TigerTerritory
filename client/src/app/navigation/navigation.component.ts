@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({

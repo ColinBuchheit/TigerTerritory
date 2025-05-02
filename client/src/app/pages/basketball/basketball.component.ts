@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
-import { CommentService, Comment as CommentModel } from '../services/comment.service';
+import { AuthService } from '../../services/auth.service';
+import { CommentService, Comment as CommentModel } from '../../services/comment.service';
 import { Subscription } from 'rxjs';
 
 interface Article {
