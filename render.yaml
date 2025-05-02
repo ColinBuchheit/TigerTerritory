@@ -2,20 +2,14 @@ services:
   - type: web
     name: tigerterritory
     env: node
-    buildCommand: npm install && cd client && npm install && npm run build && cd ..
+    buildCommand: npm install && npm run build
     startCommand: node server.js
     envVars:
-      - key: NODE_VERSION
-        value: 18.x
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: MONGO_URI
-        value: # Add your MongoDB connection string here or as a secret
-        # If using a secret in Render dashboard:
-        # sync: false
+        sync: false  # Set this in the Render dashboard
       - key: JWT_SECRET
-        value: # Add your JWT secret here or as a secret
-        # sync: false
-    healthCheckPath: /api
+        sync: false  # Set this in the Render dashboard

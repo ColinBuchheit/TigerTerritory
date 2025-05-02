@@ -2,69 +2,76 @@ const express = require('express');
 const path = require('path');
 const compression = require('compression');
 const helmet = require('helmet');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const fs = require('fs');
 
+// Create Express app
 const app = express();
-const PORT = process.env.PORT || 4200;
+const PORT = process.env.PORT || 10000;
 
-// Security middleware with CSP disabled for Angular
-app.use(helmet({
-  contentSecurityPolicy: false
-}));
-
-// Compression middleware
+// Middleware
+app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// Import API routes in production mode
+// Determine Angular build path
+const angularBuildPath = path.join(__dirname, 'client/dist/sports-website');
+console.log(`Angular build path: ${angularBuildPath}`);
+console.log(`Directory exists: ${fs.existsSync(angularBuildPath)}`);
+
+// Connect to MongoDB in production
 if (process.env.NODE_ENV === 'production') {
   console.log('Running in production mode');
   
-  // Import and connect to database
-  const connectDB = require('./server/config/db');
-  connectDB()
-    .then(() => console.log('MongoDB connected in production mode'))
-    .catch(err => console.error('MongoDB connection error:', err.message));
+  // Connect to MongoDB
+  const mongoURI = process.env.MONGO_URI;
+  if (!mongoURI) {
+    console.error('MONGO_URI environment variable is not set');
+    process.exit(1);
+  }
   
-  // Import API routes
-  const apiRoutes = require('./server/routes/index');
+  // Connect without the connectDB helper to simplify
+  mongoose.connect(mongoURI)
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => {
+      console.error('MongoDB connection error:', err.message);
+      // Don't exit on MongoDB error, still serve static files
+    });
   
-  // Mount API routes
-  app.use('/api', apiRoutes);
+  // Import and use routes
+  try {
+    const indexRoutes = require('./server/routes/index');
+    app.use('/api', indexRoutes);
+    console.log('API routes mounted successfully');
+  } catch (error) {
+    console.error('Error mounting API routes:', error);
+  }
 } else {
-  // In development, proxy API requests to the backend server
-  console.log('Running in development mode - proxying API requests to backend server');
-  
-  const apiProxy = createProxyMiddleware('/api', {
-    target: 'http://localhost:5000',
-    changeOrigin: true,
-    pathRewrite: {
-      '^/api': '/api'
-    },
-    onProxyReq: (proxyReq, req, res) => {
-      console.log(`Proxying request to: ${proxyReq.path}`);
-    },
-    onError: (err, req, res) => {
-      console.error('Proxy error:', err);
-      res.status(500).send('Proxy Error');
-    }
-  });
-  
-  app.use('/api', apiProxy);
+  // Development mode - not used in Render
+  console.log('Running in development mode');
 }
 
-// Debug - check Angular build path
-const angularBuildPath = path.join(__dirname, 'client/dist/sports-website/browser');
-console.log(`Checking for Angular build at: ${angularBuildPath}`);
-console.log(`Directory exists: ${require('fs').existsSync(angularBuildPath)}`);
+// Serve static files from Angular build
+if (fs.existsSync(angularBuildPath)) {
+  app.use(express.static(angularBuildPath));
+  console.log('Serving Angular static files');
+  
+  // For any route that doesn't match an API route or static file
+  // serve the Angular index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(angularBuildPath, 'index.html'));
+  });
+} else {
+  console.error('Angular build directory not found');
+  app.get('/', (req, res) => {
+    res.send('Angular build not found');
+  });
+}
 
-// Serve static files from the Angular app build directory
-app.use(express.static(angularBuildPath));
-
-// For all GET requests that aren't to API or static files, send back index.html
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(angularBuildPath, 'index.html'));
-});
-
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
