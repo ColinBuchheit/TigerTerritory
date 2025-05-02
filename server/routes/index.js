@@ -4,7 +4,6 @@ const router = express.Router();
 // Import individual route files
 const authRoutes = require('./authRoutes');
 const commentRoutes = require('./commentRoutes');
-const scheduleRoutes = require('./scheduleRoutes');
 
 /**
  * @swagger
@@ -38,6 +37,5 @@ router.get('/', (req, res) => {
 // Define API routes
 router.use('/auth', authRoutes);
 router.use('/comments', commentRoutes);
-router.use('/schedules', scheduleRoutes);
 
 module.exports = router;

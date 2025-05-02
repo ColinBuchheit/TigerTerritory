@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const config = require('./config');
 
+require('dotenv').config();
+
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(config.mongoURI);
@@ -27,5 +29,7 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
+
+console.log("Trying to connect to:", config.mongoURI.replace(/:[^@]+@/, ':*****@'));
 
 module.exports = connectDB;
