@@ -4,10 +4,11 @@ const { formatResponse } = require('../utils/responseFormatter');
 /**
  * Rate limiter middleware
  * Limits the number of requests from a single IP
+ * Set to extremely high values to effectively disable rate limiting
  */
 exports.apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100000, // Very high limit each IP to effectively disable rate limiting
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   handler: (req, res) => {
@@ -22,10 +23,11 @@ exports.apiLimiter = rateLimit({
 /**
  * Auth rate limiter middleware
  * More strict rate limiting for authentication routes
+ * Set to extremely high values to effectively disable rate limiting
  */
 exports.authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // limit each IP to 10 requests per windowMs
+  max: 10000, // Very high limit to effectively disable rate limiting
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
