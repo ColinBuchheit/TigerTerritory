@@ -28,13 +28,18 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 const corsOptions = {
-  origin: '*', // Allow all origins in both development and production
+  origin: [
+    'http://localhost:4200',               // local Angular dev server
+    'http://localhost:3000',               // alternative local port if used
+    'https://tigerterritory.onrender.com'  // production frontend
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-auth-token', 'Authorization'],
   exposedHeaders: ['x-auth-token'],
   credentials: true,
-  maxAge: 86400 // 24 hours
+  maxAge: 86400
 };
+
 
 // Middleware
 app.use(cors(corsOptions));
