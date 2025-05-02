@@ -71,7 +71,32 @@
                     <span class="comment-author">{{comment.author || 'Anonymous'}}</span>
                     <span class="comment-date">{{comment.date}}</span>
                   </div>
-                  <p class="comment-text">{{comment.text}}</p>
+                  
+                  <!-- Regular Comment Text (when not editing) -->
+                  <p class="comment-text" *ngIf="editingComment !== comment.id">{{comment.text}}</p>
+                  
+                  <!-- Comment Actions -->
+                  <div class="comment-actions" *ngIf="isUserLoggedIn() && (isAdmin() || isCommentAuthor(comment.user))">
+                    <button class="action-button edit-button" (click)="editComment(comment.id)" *ngIf="editingComment !== comment.id">
+                      <span>Edit</span>
+                    </button>
+                    <button class="action-button delete-button" (click)="deleteComment(comment.id)" *ngIf="editingComment !== comment.id">
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                  
+                  <!-- Edit Form (when editing) -->
+                  <div class="edit-form" *ngIf="editingComment === comment.id">
+                    <textarea 
+                      [(ngModel)]="editCommentText"
+                      class="comment-textarea"
+                      placeholder="Edit your comment..."
+                    ></textarea>
+                    <div class="edit-actions">
+                      <button class="action-button save-button" (click)="saveEditComment(comment.id)">Save</button>
+                      <button class="action-button cancel-button" (click)="cancelEditComment()">Cancel</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
