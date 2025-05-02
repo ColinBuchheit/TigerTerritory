@@ -31,7 +31,7 @@ if (process.env.NODE_ENV !== 'test') {
 // Adjust this to include both local and deployed frontend origins
 const allowedOrigins = [
   'http://localhost:4200', // local dev
-  'https://tiger-territory.onrender.com' 
+  'https://tigerterritory.onrender.com' 
 ];
 
 const corsOptions = {
