@@ -207,7 +207,7 @@ Our team worked collaboratively across the full stack, with each member contribu
 
 The application is deployed and accessible at the following URL:
 
-- **Live Site:** [https://tiger-territory.onrender.com](https://tiger-territory.onrender.com)
+- **Live Site:** [https://tiger-territory.onrender.com](https://tigerterritory.onrender.com/)
 
 ### Deployment Architecture
 
