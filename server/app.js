@@ -28,28 +28,42 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 
-// Adjust this to include both local and deployed frontend origins
-const allowedOrigins = [
-  'http://localhost:4200', // local dev
-  'https://tigerterritory.onrender.com' 
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed for this origin: ' + origin));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-auth-token'],
-  exposedHeaders: ['x-auth-token'],
-  credentials: true
+// Adjust CORS based on whether we're running in an integrated server or standalone
+const corsConfig = () => {
+  // If running as part of the unified server (production), allow same-origin requests
+  if (process.env.NODE_ENV === 'production') {
+    return cors({
+      // In production when integrated in server.js, this allows same-origin requests
+      origin: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'x-auth-token'],
+      exposedHeaders: ['x-auth-token'],
+      credentials: true
+    });
+  } else {
+    // In development when running as separate servers, allow specific origins
+    const allowedOrigins = [
+      'http://localhost:4200' // local angular dev
+    ];
+    
+    return cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('CORS not allowed for this origin: ' + origin));
+        }
+      },
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'x-auth-token'],
+      exposedHeaders: ['x-auth-token'],
+      credentials: true
+    });
+  }
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests
+app.use(corsConfig());
+app.options('*', corsConfig()); // Handle preflight requests
 
 
 
@@ -83,14 +97,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
 // Routes
 app.use('/api', indexRoutes);
 
-// Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, '../client/build')));
-
-  // Any routes not handled by the API will be handled by React
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+// Note: Static file serving is handled by the parent server.js in production
+// This is only used when running the API server standalone
+if (process.env.NODE_ENV === 'development') {
+  // In development, provide some basic info for direct API access
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'API server running',
+      endpoints: '/api/*'
+    });
   });
 }
 
