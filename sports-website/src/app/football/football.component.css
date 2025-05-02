@@ -1,21 +1,7 @@
-/* Updated football.component.css with CSS animations */
-:root {
-  --mizzou-gold: #F1B82D;
-  --mizzou-black: #000000;
-  --mizzou-white: #FFFFFF;
-  --mizzou-gray: #333333;
-  --mizzou-light-gray: #F5F5F5;
-  --mizzou-border: #E2E2E2;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
-}
-
 /* Page Header */
 .page-header {
-  background-color: var(--mizzou-black);
-  color: var(--mizzou-white);
+  background-color: var(--mizzou-black, #000000);
+  color: var(--mizzou-white, #FFFFFF);
   padding: 3rem 0;
   position: relative;
 }
@@ -27,7 +13,7 @@
   left: 0;
   width: 100%;
   height: 5px;
-  background-color: var(--mizzou-gold);
+  background-color: var(--mizzou-gold, #F1B82D);
 }
 
 .container {
@@ -40,7 +26,7 @@
   font-size: 2.5rem;
   font-weight: 800;
   margin: 0 0 0.5rem;
-  color: var(--mizzou-gold);
+  color: var(--mizzou-gold, #F1B82D);
   letter-spacing: 0.5px;
 }
 
@@ -53,7 +39,7 @@
 /* Articles Section */
 .articles-section {
   padding: 3rem 0;
-  background-color: var(--mizzou-light-gray);
+  background-color: var(--mizzou-light-gray, #F5F5F5);
 }
 
 .articles-grid {
@@ -64,15 +50,15 @@
 
 /* Article Card */
 .article-card {
-  background-color: var(--mizzou-white);
+  background-color: var(--mizzou-white, #FFFFFF);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-normal);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
 }
 
 .article-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 /* Article Image */
@@ -115,7 +101,7 @@
   height: 40px;
   border: 3px solid rgba(241, 184, 45, 0.3);
   border-radius: 50%;
-  border-top-color: var(--mizzou-gold);
+  border-top-color: var(--mizzou-gold, #F1B82D);
   animation: spin 1s linear infinite;
 }
 
@@ -127,15 +113,15 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: var(--mizzou-gold);
-  color: var(--mizzou-black);
+  background-color: var(--mizzou-gold, #F1B82D);
+  color: var(--mizzou-black, #000000);
   padding: 0.4rem 1rem;
   border-radius: 50px;
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Article Content */
@@ -159,11 +145,11 @@
   font-weight: 700;
   margin: 0 0 1rem;
   line-height: 1.3;
-  color: var(--mizzou-black);
+  color: var(--mizzou-black, #000000);
 }
 
 .article-excerpt {
-  color: var(--mizzou-gray);
+  color: var(--mizzou-gray, #333333);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -182,15 +168,15 @@
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .read-button {
-  background-color: var(--mizzou-gold);
-  color: var(--mizzou-black);
+  background-color: var(--mizzou-gold, #F1B82D);
+  color: var(--mizzou-black, #000000);
   flex: 1;
 }
 
@@ -199,8 +185,8 @@
 }
 
 .comment-button {
-  background-color: var(--mizzou-light-gray);
-  color: var(--mizzou-gray);
+  background-color: var(--mizzou-light-gray, #F5F5F5);
+  color: var(--mizzou-gray, #333333);
   flex: 1;
 }
 
@@ -210,7 +196,7 @@
 
 /* Expanded Content */
 .expanded-content {
-  border-top: 1px solid var(--mizzou-border);
+  border-top: 1px solid #e2e2e2;
   padding-top: 0;
   margin-top: 0.5rem;
   overflow: hidden;
@@ -228,12 +214,12 @@
 .expanded-text p {
   margin-bottom: 1rem;
   line-height: 1.7;
-  color: var(--mizzou-gray);
+  color: var(--mizzou-gray, #333333);
 }
 
 /* Comments Section */
 .comments-section {
-  border-top: 1px solid var(--mizzou-border);
+  border-top: 1px solid #e2e2e2;
   padding-top: 0;
   margin-top: 0.5rem;
   overflow: hidden;
@@ -245,7 +231,7 @@
 .comments-section.expanded {
   max-height: 2000px; /* Arbitrary large value */
   opacity: 1;
-  padding-top: a1.5rem;
+  padding-top: 1.5rem;
 }
 
 .comments-header {
@@ -291,7 +277,7 @@
 
 .comment-author {
   font-weight: 600;
-  color: var(--mizzou-black);
+  color: var(--mizzou-black, #000000);
 }
 
 .comment-date {
@@ -302,7 +288,7 @@
 .comment-text {
   margin: 0;
   line-height: 1.6;
-  color: var(--mizzou-gray);
+  color: var(--mizzou-gray, #333333);
 }
 
 .no-comments {
@@ -344,16 +330,16 @@
   resize: vertical;
   font-family: inherit;
   font-size: 0.95rem;
-  transition: border-color var(--transition-fast);
+  transition: border-color 0.2s ease;
 }
 
 .comment-textarea:focus {
   outline: none;
-  border-color: var(--mizzou-gold);
+  border-color: var(--mizzou-gold, #F1B82D);
 }
 
 .comment-textarea.active {
-  border-color: var(--mizzou-gold);
+  border-color: var(--mizzou-gold, #F1B82D);
 }
 
 .submit-button {
@@ -364,12 +350,12 @@
   border-radius: 50px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
 }
 
 .submit-button.active {
-  background-color: var(--mizzou-gold);
-  color: var(--mizzou-black);
+  background-color: var(--mizzou-gold, #F1B82D);
+  color: var(--mizzou-black, #000000);
 }
 
 .submit-button.active:hover {
@@ -381,6 +367,40 @@
   opacity: 0.7;
 }
 
+.login-prompt {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.login-prompt a {
+  color: var(--mizzou-gold, #F1B82D);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
+
+/* Loading and Error States */
+.comments-loading,
+.comments-error {
+  text-align: center;
+  padding: 2rem 0;
+  color: #666;
+}
+
+.comments-loading .loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(241, 184, 45, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--mizzou-gold, #F1B82D);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
 /* Responsive Design */
 @media (min-width: 768px) {
   .articles-grid {
@@ -390,7 +410,7 @@
 
 @media (min-width: 1024px) {
   .articles-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

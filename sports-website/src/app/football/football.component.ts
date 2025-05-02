@@ -1,16 +1,10 @@
-// Fixed football.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
-interface Comment {
-  id: string;
-  author: string;
-  text: string;
-  date: string;
-  articleId: number;
-}
+import { AuthService } from '../auth/auth.service';
+import { CommentService, Comment as CommentModel } from '../services/comment.service';
+import { Subscription } from 'rxjs';
 
 interface Article {
   id: number;
@@ -20,6 +14,7 @@ interface Article {
   content: string[];
   date: string;
   category: string;
+  postId: string; // Identifier for the backend
 }
 
 @Component({
@@ -29,14 +24,17 @@ interface Article {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule]
 })
-export class FootballComponent implements OnInit {
+export class FootballComponent implements OnInit, OnDestroy {
   expandedArticle: number | null = null;
   activeCommentSection: number | null = null;
-  newComments: string[] = ['', '', '', ''];
-  imageLoaded: boolean[] = [false, false, false, false];
-  currentUser = { name: 'Tiger Fan', id: 'user-1' }; // In a real app, get this from auth service
+  newComments: string[] = [];
+  imageLoaded: boolean[] = [];
+  comments: CommentModel[] = [];
+  isLoadingComments: boolean = false;
+  commentError: string | null = null;
+  private subscriptions: Subscription[] = [];
   
-  // Sample articles data
+  // Sample articles data with postId for backend
   articles: Article[] = [
     {
       id: 0,
@@ -49,7 +47,8 @@ export class FootballComponent implements OnInit {
         'Missouri\'s defense forced three Arkansas turnovers, converting Walker\'s two forced fumbles into touchdown drives. Mizzou trailed twice in the game – including 14-7 at halftime – but forged ahead for good on an 11-yard rushing score by Carroll with 11:43 to play that capped a 12-play, 77-yard drive.'
       ],
       date: 'May 1, 2025',
-      category: 'Game Recap'
+      category: 'Game Recap',
+      postId: 'football-news-1'
     },
     {
       id: 1,
@@ -62,7 +61,8 @@ export class FootballComponent implements OnInit {
         'In his senior season, the Panthers averaged 47.4 points per game.'
       ],
       date: 'April 28, 2025',
-      category: 'Recruitment'
+      category: 'Recruitment',
+      postId: 'football-news-2'
     },
     {
       id: 2,
@@ -75,7 +75,8 @@ export class FootballComponent implements OnInit {
         'Brady Cook completed 27-of-39 passes for 395 yards and two touchdowns. He has now thrown 218 consecutive passes without an interception, a school record.'
       ],
       date: 'April 15, 2025',
-      category: 'Game Recap'
+      category: 'Game Recap',
+      postId: 'football-news-3'
     },
     {
       id: 3,
@@ -88,88 +89,54 @@ export class FootballComponent implements OnInit {
         '"It\'s something that they should take a lot of pride in back-to-back seasons," Drinkwitz said. "Finishing ranked is an unbelievable accomplishment for our program and really, really proud of them."'
       ],
       date: 'April 10, 2025',
-      category: 'Bowl Game'
+      category: 'Bowl Game',
+      postId: 'football-news-4'
     }
   ];
   
-  // Comments array will be initialized from localStorage
-  comments: Comment[] = [];
-  
-  constructor() {}
+  constructor(
+    private authService: AuthService,
+    private commentService: CommentService
+  ) {}
   
   ngOnInit(): void {
     // Initialize image loaded states
     this.imageLoaded = this.articles.map(() => false);
     
-    // Load comments from localStorage
-    this.loadComments();
+    // Initialize new comments array
+    this.newComments = this.articles.map(() => '');
     
-    // If there are no comments (first visit), set up initial comments
-    if (this.comments.length === 0) {
-      this.setupInitialComments();
-    }
+    // Load comments for all articles
+    this.articles.forEach(article => {
+      this.loadComments(article.postId);
+    });
+  }
+  
+  // Load comments from backend
+  loadComments(postId: string): void {
+    this.isLoadingComments = true;
+    
+    const subscription = this.commentService.getCommentsByPostId(postId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Add comments from this post to the overall comments array
+          this.comments = [...this.comments, ...response.data.comments];
+        }
+        this.isLoadingComments = false;
+      },
+      error: (error) => {
+        console.error('Error loading comments:', error);
+        this.commentError = 'Failed to load comments. Please try again later.';
+        this.isLoadingComments = false;
+      }
+    });
+    
+    this.subscriptions.push(subscription);
   }
   
   // Helper function to safely check if comment has text
   hasCommentText(index: number): boolean {
     return !!this.newComments[index] && this.newComments[index].trim().length > 0;
-  }
-  
-  // Load comments from localStorage
-  loadComments(): void {
-    const savedComments = localStorage.getItem('football_comments');
-    if (savedComments) {
-      this.comments = JSON.parse(savedComments);
-    }
-  }
-  
-  // Save comments to localStorage
-  saveComments(): void {
-    localStorage.setItem('football_comments', JSON.stringify(this.comments));
-  }
-  
-  // Initial comment setup
-  setupInitialComments(): void {
-    this.comments = [
-      {
-        id: '1',
-        author: 'Tiger Fan',
-        text: 'Great win for Mizzou! The defense really stepped up when it mattered.',
-        date: 'May 1, 2025',
-        articleId: 0
-      },
-      {
-        id: '2',
-        author: 'SEC4Life',
-        text: 'Carroll is having an amazing season. Glad to see the running game so strong.',
-        date: 'May 1, 2025',
-        articleId: 0
-      },
-      {
-        id: '3',
-        author: 'RecruitWatcher',
-        text: 'Early is a great addition! We needed depth on the offensive line.',
-        date: 'April 28, 2025',
-        articleId: 1
-      },
-      {
-        id: '4',
-        author: 'Mizzou Alum',
-        text: 'What a thriller against Vandy! Cook to Burden is becoming an elite connection.',
-        date: 'April 15, 2025',
-        articleId: 2
-      },
-      {
-        id: '5',
-        author: 'BowlGameExpert',
-        text: 'That 56-yard field goal was clutch! Great way to finish the season.',
-        date: 'April 10, 2025',
-        articleId: 3
-      }
-    ];
-    
-    // Save to localStorage
-    this.saveComments();
   }
   
   onImageLoad(index: number): void {
@@ -200,8 +167,9 @@ export class FootballComponent implements OnInit {
     }
   }
   
-  getArticleComments(articleId: number): Comment[] {
-    return this.comments.filter(comment => comment.articleId === articleId);
+  getArticleComments(articleId: number): CommentModel[] {
+    const postId = this.articles[articleId].postId;
+    return this.comments.filter(comment => comment.postId === postId);
   }
   
   getCommentCount(articleId: number): number {
@@ -213,31 +181,61 @@ export class FootballComponent implements OnInit {
       return;
     }
     
+    // Check if user is authenticated
+    if (!this.authService.isLoggedIn()) {
+      alert('Please sign in to leave a comment.');
+      return;
+    }
+    
+    const postId = this.articles[articleId].postId;
+    
     // Create new comment
-    const newComment: Comment = {
-      id: `comment-${Date.now()}`,
-      author: this.currentUser.name,
-      text: this.newComments[articleId],
-      date: new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
-      articleId: articleId
+    const newComment: CommentModel = {
+      postId: postId,
+      text: this.newComments[articleId]
     };
     
-    // Add to comments array
-    this.comments.push(newComment);
+    // Send to backend
+    const subscription = this.commentService.addComment(newComment).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // If the backend returns the full comment with user info
+          if (response.data) {
+            this.comments.push(response.data);
+          } else {
+            // Otherwise create a temporary comment to display
+            const tempComment: CommentModel = {
+              id: `temp-${Date.now()}`,
+              postId: postId,
+              text: this.newComments[articleId],
+              author: this.authService.getCurrentUserName(),
+              authorEmail: this.authService.getCurrentUserEmail(),
+              date: new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+            };
+            this.comments.push(tempComment);
+          }
+          
+          // Clear input
+          this.newComments[articleId] = '';
+        } else {
+          alert(response.message || 'Failed to add comment');
+        }
+      },
+      error: (error) => {
+        console.error('Error adding comment:', error);
+        alert('Failed to add comment. Please try again later.');
+      }
+    });
     
-    // Save to localStorage
-    this.saveComments();
-    
-    // Clear input
-    this.newComments[articleId] = '';
+    this.subscriptions.push(subscription);
   }
   
-  // Generate consistent colors for user avatars
-  getAvatarColor(username: string): string {
+  // Generate consistent colors for user avatars based on email or name
+  getAvatarColor(username: string, email?: string): string {
     const colors = [
       '#F1B82D', // Mizzou Gold
       '#1E88E5', // Blue
@@ -247,14 +245,28 @@ export class FootballComponent implements OnInit {
       '#FB8C00'  // Orange
     ];
     
+    // Use email if available for more uniqueness, otherwise fall back to username
+    const stringToHash = email || username;
+    
     // Simple hash function to get consistent colors
     let hash = 0;
-    for (let i = 0; i < username.length; i++) {
-      hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    for (let i = 0; i < stringToHash.length; i++) {
+      hash = stringToHash.charCodeAt(i) + ((hash << 5) - hash);
     }
     
     // Get color from the array
     const index = Math.abs(hash) % colors.length;
     return colors[index];
+  }
+  
+  // Public method to check if user is logged in
+  // This avoids direct template access to private authService
+  isUserLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+  
+  ngOnDestroy(): void {
+    // Clean up subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

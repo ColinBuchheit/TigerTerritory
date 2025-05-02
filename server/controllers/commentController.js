@@ -30,9 +30,27 @@ exports.addComment = asyncHandler(async (req, res) => {
     });
     
     const comment = await newComment.save();
-    await comment.populate('user', ['name', 'avatar']);
     
-    res.status(201).json(formatResponse(true, 'Comment added successfully', comment));
+    // Populate the user field to include name and email
+    await comment.populate('user', ['name', 'email', 'avatar']);
+    
+    // Format comment for frontend
+    const formattedComment = {
+      id: comment._id,
+      text: comment.text,
+      postId: comment.postId,
+      author: comment.user.name,
+      authorEmail: comment.user.email,
+      date: comment.date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      user: comment.user._id,
+      likes: comment.likes
+    };
+    
+    res.status(201).json(formatResponse(true, 'Comment added successfully', formattedComment));
   });
 });
 
@@ -50,12 +68,28 @@ exports.getCommentsByPost = asyncHandler(async (req, res) => {
   
   const total = await Comment.countDocuments({ postId });
   
-  // Get comments with pagination
+  // Get comments with pagination and populate user
   const comments = await Comment.find({ postId })
     .sort({ date: -1 })
     .skip(skip)
     .limit(limit)
-    .populate('user', ['name', 'avatar']);
+    .populate('user', ['name', 'email', 'avatar']);
+  
+  // Format comments for frontend
+  const formattedComments = comments.map(comment => ({
+    id: comment._id,
+    text: comment.text,
+    postId: comment.postId,
+    author: comment.user.name,
+    authorEmail: comment.user.email,
+    date: comment.date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    user: comment.user._id,
+    likes: comment.likes.length
+  }));
   
   const paginationInfo = {
     total,
@@ -65,7 +99,7 @@ exports.getCommentsByPost = asyncHandler(async (req, res) => {
   };
   
   res.json(formatResponse(true, 'Comments retrieved successfully', { 
-    comments, 
+    comments: formattedComments, 
     pagination: paginationInfo 
   }));
 });
@@ -91,9 +125,25 @@ exports.updateComment = asyncHandler(async (req, res) => {
       req.params.id,
       { text, updatedAt: Date.now() },
       { new: true }
-    ).populate('user', ['name', 'avatar']);
+    ).populate('user', ['name', 'email', 'avatar']);
     
-    res.json(formatResponse(true, 'Comment updated successfully', comment));
+    // Format updated comment for frontend
+    const formattedComment = {
+      id: comment._id,
+      text: comment.text,
+      postId: comment.postId,
+      author: comment.user.name,
+      authorEmail: comment.user.email,
+      date: comment.date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      user: comment.user._id,
+      likes: comment.likes.length
+    };
+    
+    res.json(formatResponse(true, 'Comment updated successfully', formattedComment));
   });
 });
 

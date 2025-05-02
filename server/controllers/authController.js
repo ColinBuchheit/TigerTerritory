@@ -36,7 +36,10 @@ exports.register = asyncHandler(async (req, res) => {
     // Create token
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
       }
     };
 
@@ -46,7 +49,20 @@ exports.register = asyncHandler(async (req, res) => {
       { expiresIn: config.jwtExpiresIn },
       (err, token) => {
         if (err) throw err;
-        res.status(201).json(formatResponse(true, 'User registered successfully', { token }));
+        
+        // Return user information along with token
+        const userData = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar
+        };
+        
+        res.status(201).json(formatResponse(true, 'User registered successfully', { 
+          token, 
+          user: userData 
+        }));
       }
     );
   });
@@ -76,7 +92,10 @@ exports.login = asyncHandler(async (req, res) => {
     // Create token
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
       }
     };
 
@@ -86,7 +105,20 @@ exports.login = asyncHandler(async (req, res) => {
       { expiresIn: config.jwtExpiresIn },
       (err, token) => {
         if (err) throw err;
-        res.json(formatResponse(true, 'Login successful', { token }));
+        
+        // Return user information along with token
+        const userData = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar
+        };
+        
+        res.json(formatResponse(true, 'Login successful', { 
+          token, 
+          user: userData 
+        }));
       }
     );
   });
@@ -102,5 +134,6 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
   
   if (checkResourceNotFound(user, res, 'User')) return;
   
+  // Return complete user object (excluding password)
   res.json(formatResponse(true, 'User retrieved successfully', user));
 });

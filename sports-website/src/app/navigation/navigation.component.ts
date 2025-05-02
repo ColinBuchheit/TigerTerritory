@@ -1,4 +1,3 @@
-// Improved navigation.component.ts
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -20,7 +19,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
   user: any = null;
   showProfileMenu = false;
   isMobileMenuOpen = false;
-  hasNotifications = false; // Set to true when you have notifications to show
   
   private authSubscription!: Subscription;
   private userSubscription!: Subscription;
@@ -51,10 +49,15 @@ export class NavigationComponent implements OnInit, OnDestroy {
     this.userSubscription = this.authService.user$.subscribe(
       userData => {
         this.user = userData;
+        console.log('User data loaded:', userData); // Debug log
       }
     );
     
-    this.authService.getCurrentUser().subscribe();
+    this.authService.getCurrentUser().subscribe(
+      response => {
+        console.log('Current user response:', response); // Debug log
+      }
+    );
   }
 
   toggleProfileMenu(): void {
@@ -87,7 +90,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.showProfileMenu = false;
     }
     
-    // Handle mobile menu close when clicking outside (optional)
+    // Handle mobile menu close when clicking outside
     const target = event.target as HTMLElement;
     if (this.isMobileMenuOpen && 
         !target.closest('.mobile-menu-toggle') && 
