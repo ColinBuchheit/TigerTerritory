@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const config = require('../config/config');
 const { exec } = require('child_process');
 const path = require('path');
-const User = require('../models/user'); // Changed to lowercase
+const User = require('../models/User'); // Changed to lowercase
 const Comment = require('../models/Comment');
 
 // Connect to MongoDB

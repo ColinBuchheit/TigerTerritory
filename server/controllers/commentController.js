@@ -117,8 +117,8 @@ exports.updateComment = asyncHandler(async (req, res) => {
     
     if (checkResourceNotFound(comment, res, 'Comment')) return;
     
-    const isAdmin = req.user.role === 'admin';
-    if (!isAdmin && checkUnauthorized(comment, req.user.id, res, 'update')) return;
+    // Check if user is authorized (admin or owner)
+    if (checkUnauthorized(comment, req.user.id, res, req.user.role, 'update')) return;
     
     // Update comment
     comment = await Comment.findByIdAndUpdate(
@@ -128,20 +128,19 @@ exports.updateComment = asyncHandler(async (req, res) => {
     ).populate('user', ['name', 'email', 'avatar']);
     
     // Format updated comment for frontend
-    // Format comment for frontend
-  const formattedComment = {
-    id: comment._id,
-    text: comment.text,
-    postId: comment.postId,
-    author: comment.user.name,
-    authorEmail: comment.user.email,
-    date: comment.date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }),
-    user: comment.user._id
-  };
+    const formattedComment = {
+      id: comment._id,
+      text: comment.text,
+      postId: comment.postId,
+      author: comment.user.name,
+      authorEmail: comment.user.email,
+      date: comment.date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }),
+      user: comment.user._id
+    };
     
     res.json(formatResponse(true, 'Comment updated successfully', formattedComment));
   });
@@ -157,12 +156,62 @@ exports.deleteComment = asyncHandler(async (req, res) => {
   
   if (checkResourceNotFound(comment, res, 'Comment')) return;
   
-  // Check if user owns the comment or is an admin
-  const isAdmin = req.user.role === 'admin';
-  if (!isAdmin && checkUnauthorized(comment, req.user.id, res, 'delete')) return;
+  // Check if user is authorized (admin or owner)
+  if (checkUnauthorized(comment, req.user.id, res, req.user.role, 'delete')) return;
   
   await Comment.deleteOne({ _id: comment._id });
   
   res.json(formatResponse(true, 'Comment deleted successfully', {}));
 });
 
+/**
+ * @desc    Get all comments (admin only)
+ * @route   GET /api/comments
+ * @access  Admin
+ */
+exports.getAllComments = asyncHandler(async (req, res) => {
+  // Check if user is admin
+  if (req.user.role !== 'admin') {
+    return res.status(403).json(formatResponse(false, 'Access denied. Admin role required', null));
+  }
+  
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 20;
+  const skip = (page - 1) * limit;
+  
+  const total = await Comment.countDocuments();
+  
+  // Get all comments with pagination and populate user
+  const comments = await Comment.find()
+    .sort({ date: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate('user', ['name', 'email', 'avatar']);
+  
+  // Format comments for frontend
+  const formattedComments = comments.map(comment => ({
+    id: comment._id,
+    text: comment.text,
+    postId: comment.postId,
+    author: comment.user ? comment.user.name : 'Anonymous',
+    authorEmail: comment.user ? comment.user.email : '',
+    date: comment.date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    user: comment.user ? comment.user._id : null
+  }));
+  
+  const paginationInfo = {
+    total,
+    page,
+    limit,
+    pages: Math.ceil(total / limit)
+  };
+  
+  res.json(formatResponse(true, 'All comments retrieved successfully', { 
+    comments: formattedComments, 
+    pagination: paginationInfo 
+  }));
+});

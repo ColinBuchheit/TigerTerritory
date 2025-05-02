@@ -60,14 +60,21 @@ exports.checkResourceNotFound = (resource, res, resourceName = 'Resource') => {
 };
 
 /**
- * Handles resource authorization pattern
+ * Handles resource authorization pattern with admin override
  * @param {*} resource - Resource with user property
  * @param {string} userId - User ID to check against
  * @param {Response} res - Express response object
+ * @param {string} userRole - Role of the user (admin or user)
  * @param {string} action - Action being performed (e.g., 'update', 'delete')
  * @returns {boolean} True if unauthorized and response sent
  */
-exports.checkUnauthorized = (resource, userId, res, action = 'access') => {
+exports.checkUnauthorized = (resource, userId, res, userRole = 'user', action = 'access') => {
+  // Admin users can perform any action
+  if (userRole === 'admin') {
+    return false;
+  }
+  
+  // For regular users, check if they own the resource
   if (resource.user.toString() !== userId) {
     res.status(401).json(formatResponse(false, `Not authorized to ${action} this resource`, null));
     return true;

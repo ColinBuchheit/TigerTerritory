@@ -2,8 +2,42 @@ const express = require('express');
 const router = express.Router();
 const commentController = require('../controllers/commentController');
 const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const { commentValidation } = require('../middleware/validators');
 const { apiLimiter } = require('../middleware/rateLimiter');
+
+/**
+ * @swagger
+ * /api/comments:
+ *   get:
+ *     summary: Get all comments (admin only)
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Number of items per page
+ *     responses:
+ *       200:
+ *         description: List of all comments with pagination
+ *       401:
+ *         description: Not authorized
+ *       403:
+ *         description: Admin role required
+ *       500:
+ *         description: Server error
+ */
+router.get('/', [auth, adminAuth], commentController.getAllComments);
 
 /**
  * @swagger
@@ -146,34 +180,5 @@ router.put('/:id', [auth, commentValidation], commentController.updateComment);
  *         description: Server error
  */
 router.delete('/:id', auth, commentController.deleteComment);
-
-/**
- * @swagger
- * /api/comments/{id}/like:
- *   put:
- *     summary: Like a comment
- *     tags: [Comments]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Comment ID
- *     responses:
- *       200:
- *         description: Comment liked successfully
- *       400:
- *         description: Comment already liked
- *       401:
- *         description: Not authorized
- *       404:
- *         description: Comment not found
- *       500:
- *         description: Server error
- */
-
 
 module.exports = router;

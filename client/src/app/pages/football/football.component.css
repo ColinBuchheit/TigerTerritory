@@ -30,6 +30,8 @@
   letter-spacing: 0.5px;
 }
 
+
+
 .page-subtitle {
   font-size: 1.1rem;
   margin: 0;
@@ -40,6 +42,37 @@
 .articles-section {
   padding: 3rem 0;
   background-color: var(--mizzou-light-gray, #F5F5F5);
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-button {
+  background-color: #f0f0f0;
+  color: var(--mizzou-gray, #333333);
+}
+
+.edit-button:hover {
+  background-color: #e0e0e0;
+}
+
+.delete-button {
+  background-color: #ffeb
 }
 
 .articles-grid {

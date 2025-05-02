@@ -32,6 +32,8 @@ export class FootballComponent implements OnInit, OnDestroy {
   comments: CommentModel[] = [];
   isLoadingComments: boolean = false;
   commentError: string | null = null;
+  editingComment: string | null = null;
+  editCommentText: string = '';
   private subscriptions: Subscription[] = [];
   
   // Sample articles data with postId for backend
@@ -182,7 +184,7 @@ export class FootballComponent implements OnInit, OnDestroy {
     }
     
     // Check if user is authenticated
-    if (!this.authService.isLoggedIn()) {
+    if (!this.isUserLoggedIn()) {
       alert('Please sign in to leave a comment.');
       return;
     }
@@ -234,6 +236,98 @@ export class FootballComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription);
   }
   
+  // Begin editing a comment
+  editComment(commentId: string | undefined): void {
+    if (!commentId) return;
+    
+    const comment = this.comments.find(c => c.id === commentId);
+    if (!comment) return;
+    
+    this.editingComment = commentId;
+    this.editCommentText = comment.text;
+  }
+  
+  // Cancel editing
+  cancelEditComment(): void {
+    this.editingComment = null;
+    this.editCommentText = '';
+  }
+  
+  // Save edited comment
+  saveEditComment(commentId: string): void {
+    if (!commentId || !this.editCommentText.trim()) {
+      return;
+    }
+    
+    const subscription = this.commentService.updateComment(commentId, this.editCommentText).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Update the comment in the local array
+          const index = this.comments.findIndex(c => c.id === commentId);
+          if (index !== -1) {
+            this.comments[index].text = this.editCommentText;
+          }
+          
+          // Reset editing state
+          this.editingComment = null;
+          this.editCommentText = '';
+        } else {
+          alert(response.message || 'Failed to update comment');
+        }
+      },
+      error: (error) => {
+        console.error('Error updating comment:', error);
+        alert('Failed to update comment. Please try again later.');
+      }
+    });
+    
+    this.subscriptions.push(subscription);
+  }
+  
+  // Delete a comment
+  deleteComment(commentId: string | undefined): void {
+    if (!commentId) return;
+    
+    if (!confirm('Are you sure you want to delete this comment?')) {
+      return;
+    }
+    
+    const subscription = this.commentService.deleteComment(commentId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          // Remove the comment from the local array
+          this.comments = this.comments.filter(c => c.id !== commentId);
+        } else {
+          alert(response.message || 'Failed to delete comment');
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting comment:', error);
+        alert('Failed to delete comment. Please try again later.');
+      }
+    });
+    
+    this.subscriptions.push(subscription);
+  }
+  
+  // Check if the current user is the author of a comment
+  isCommentAuthor(userId: string | undefined): boolean {
+    if (!userId) return false;
+    
+    const currentUser = this.authService.getCurrentUserSync();
+    if (!currentUser) return false;
+    
+    return currentUser.id === userId;
+  }
+  
+  // Check if the current user is an admin
+  isAdmin(): boolean {
+    const currentUser = this.authService.getCurrentUserSync();
+    if (!currentUser) return false;
+    
+    return currentUser.role === 'admin';
+  }
+  
   // Generate consistent colors for user avatars based on email or name
   getAvatarColor(username: string, email?: string): string {
     const colors = [
@@ -260,7 +354,6 @@ export class FootballComponent implements OnInit, OnDestroy {
   }
   
   // Public method to check if user is logged in
-  // This avoids direct template access to private authService
   isUserLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }

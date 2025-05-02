@@ -79,60 +79,59 @@ export class AuthService {
     );
   }
 
-// src/app/auth/auth.service.ts
-private handleAuthentication(token: string, user?: any): void {
-  localStorage.setItem('auth_token', token);
-  
-  // If user data was provided directly, use it
-  if (user) {
-    this.storeUserData(user);
-  } else {
-    // Otherwise try to decode the token to get user information
-    const tokenParts = token.split('.');
-    if (tokenParts.length === 3) {
-      try {
-        const tokenPayload = JSON.parse(atob(tokenParts[1]));
-        const expirationDate = new Date(tokenPayload.exp * 1000);
-        
-        // Store user info
-        if (tokenPayload.user) {
-          this.storeUserData(tokenPayload.user);
+  private handleAuthentication(token: string, user?: any): void {
+    localStorage.setItem('auth_token', token);
+    
+    // If user data was provided directly, use it
+    if (user) {
+      this.storeUserData(user);
+    } else {
+      // Otherwise try to decode the token to get user information
+      const tokenParts = token.split('.');
+      if (tokenParts.length === 3) {
+        try {
+          const tokenPayload = JSON.parse(atob(tokenParts[1]));
+          const expirationDate = new Date(tokenPayload.exp * 1000);
+          
+          // Store user info
+          if (tokenPayload.user) {
+            this.storeUserData(tokenPayload.user);
+          }
+          
+          this.setAutoLogout(expirationDate);
+        } catch (e) {
+          console.error('Error parsing JWT token:', e);
         }
-        
-        this.setAutoLogout(expirationDate);
-      } catch (e) {
-        console.error('Error parsing JWT token:', e);
       }
     }
+    
+    this.isAuthenticatedSubject.next(true);
   }
-  
-  this.isAuthenticatedSubject.next(true);
-}
 
-private storeUserData(userData: any): void {
-  console.log('Storing user data:', userData);
-  
-  // Handle the case where userData is the full response object
-  // with a nested data property (common in API responses)
-  const userDataToStore = userData.data ? userData.data : userData;
-  
-  // Create user object
-  const user: UserProfile = {
-    id: userDataToStore.id || userDataToStore._id || '',
-    name: userDataToStore.name || '',
-    email: userDataToStore.email || '',
-    avatar: userDataToStore.avatar || '',
-    role: userDataToStore.role || 'user'
-  };
-  
-  console.log('Processed user data:', user);
-  
-  // Update in memory
-  this.userSubject.next(user);
-  
-  // Store in localStorage for persistence
-  localStorage.setItem('user_data', JSON.stringify(user));
-}
+  private storeUserData(userData: any): void {
+    console.log('Storing user data:', userData);
+    
+    // Handle the case where userData is the full response object
+    // with a nested data property (common in API responses)
+    const userDataToStore = userData.data ? userData.data : userData;
+    
+    // Create user object
+    const user: UserProfile = {
+      id: userDataToStore.id || userDataToStore._id || '',
+      name: userDataToStore.name || '',
+      email: userDataToStore.email || '',
+      avatar: userDataToStore.avatar || '',
+      role: userDataToStore.role || 'user'
+    };
+    
+    console.log('Processed user data:', user);
+    
+    // Update in memory
+    this.userSubject.next(user);
+    
+    // Store in localStorage for persistence
+    localStorage.setItem('user_data', JSON.stringify(user));
+  }
   
   /**
    * Get user data from localStorage
@@ -167,6 +166,13 @@ private storeUserData(userData: any): void {
         return of(null);
       })
     );
+  }
+
+  /**
+   * Get current user synchronously (without Observable)
+   */
+  getCurrentUserSync(): UserProfile | null {
+    return this.userSubject.getValue();
   }
   
   /**

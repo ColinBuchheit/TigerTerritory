@@ -70,4 +70,11 @@ export class CommentService {
   deleteComment(commentId: string): Observable<CommentResponse> {
     return this.http.delete<CommentResponse>(`${this.apiUrl}/${commentId}`);
   }
+  
+  /**
+   * Get all comments (admin only)
+   */
+  getAllComments(page: number = 1, limit: number = 20): Observable<CommentListResponse> {
+    return this.http.get<CommentListResponse>(`${this.apiUrl}?page=${page}&limit=${limit}`);
+  }
 }
