@@ -27,11 +27,8 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
-// CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [config.clientUrl] // Restrict to specific domains in production
-    : '*', // Allow all origins in development
+  origin: '*', // Allow all origins in both development and production
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-auth-token', 'Authorization'],
   exposedHeaders: ['x-auth-token'],
