@@ -72,7 +72,36 @@
 }
 
 .delete-button {
-  background-color: #ffeb
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.delete-button:hover {
+  background-color: #ffcdd2;
+}
+
+.save-button {
+  background-color: var(--mizzou-gold, #F1B82D);
+  color: var(--mizzou-black, #000000);
+}
+
+.save-button:hover {
+  background-color: #e0aa25;
+}
+
+.cancel-button {
+  background-color: #f0f0f0;
+  color: var(--mizzou-gray, #333333);
+}
+
+.cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .articles-grid {

@@ -16,13 +16,13 @@
             <img [src]="article.imageUrl" [alt]="article.title" class="article-image" [ngClass]="{'loaded': imageLoaded[i]}" (load)="onImageLoad(i)">
             <div class="image-loader" *ngIf="!imageLoaded[i]"></div>
           </div>
-          <span class="article-category">{{article.category || 'Basketball'}}</span>
+          <span class="article-category">{{article.category}}</span>
         </div>
         
         <!-- Article Content -->
         <div class="article-content">
           <div class="article-meta">
-            <span class="article-date">{{ article.date || 'May 1, 2025' }}</span>
+            <span class="article-date">{{article.date}}</span>
           </div>
           <h2 class="article-title">{{article.title}}</h2>
           <p class="article-excerpt">{{article.summary}}</p>
