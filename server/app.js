@@ -27,22 +27,33 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
+
+// Adjust this to include both local and deployed frontend origins
+const allowedOrigins = [
+  'http://localhost:4200', // local dev
+  'https://tiger-territory.onrender.com' 
+];
+
 const corsOptions = {
-  origin: [
-    'http://localhost:4200',               // local Angular dev server
-    'http://localhost:3000',               // alternative local port if used
-    'https://tigerterritory.onrender.com'  // production frontend
-  ],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin: ' + origin));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-auth-token', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'x-auth-token'],
   exposedHeaders: ['x-auth-token'],
-  credentials: true,
-  maxAge: 86400
+  credentials: true
 };
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Handle preflight requests
+
 
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
