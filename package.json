@@ -1,25 +1,27 @@
 {
-    "name": "tigerterritory",
-    "version": "1.0.0",
-    "description": "Tiger Territory Sports Website",
-    "main": "server.js",
-    "scripts": {
-      "start": "node server.js",
-      "build": "cd client && npm install && npm run build",
-      "client": "cd client && npm start",
-      "server": "cd server && npm run dev",
-      "dev": "concurrently \"npm run server\" \"npm run client\""
-    },
-    "engines": {
-      "node": "18.x"
-    },
-    "dependencies": {
-      "express": "^4.18.2",
-      "compression": "^1.7.4",
-      "helmet": "^8.1.0",
-      "http-proxy-middleware": "^2.0.6"
-    },
-    "devDependencies": {
-      "concurrently": "^8.2.0"
-    }
+  "name": "tigerterritory",
+  "version": "1.0.0",
+  "description": "Tiger Territory Sports Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "cd client && npm install && npm run build",
+    "client": "cd client && npm start",
+    "server": "cd server && npm run dev",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run server\" \"npm run client\"",
+    "prod:local": "npm run build && cross-env NODE_ENV=production node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "compression": "^1.7.4",
+    "helmet": "^8.1.0",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "cross-env": "^7.0.3"
   }
+}

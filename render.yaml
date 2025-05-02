@@ -11,4 +11,11 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: MONGO_URI
+        value: # Add your MongoDB connection string here or as a secret
+        # If using a secret in Render dashboard:
+        # sync: false
+      - key: JWT_SECRET
+        value: # Add your JWT secret here or as a secret
+        # sync: false
     healthCheckPath: /api

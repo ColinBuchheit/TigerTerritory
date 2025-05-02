@@ -7,22 +7,6 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const app = express();
 const PORT = process.env.PORT || 4200;
 
-// Add proxy-middleware
-const apiProxy = createProxyMiddleware('/api', {
-  target: 'http://localhost:5000',
-  changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api'
-  },
-  onProxyReq: (proxyReq, req, res) => {
-    console.log(`Proxying request to: ${proxyReq.path}`);
-  },
-  onError: (err, req, res) => {
-    console.error('Proxy error:', err);
-    res.status(500).send('Proxy Error');
-  }
-});
-
 // Security middleware with CSP disabled for Angular
 app.use(helmet({
   contentSecurityPolicy: false
@@ -31,25 +15,56 @@ app.use(helmet({
 // Compression middleware
 app.use(compression());
 
-// Check if we're in production mode with backend server available
+// Import API routes in production mode
 if (process.env.NODE_ENV === 'production') {
-  // API routes are served by the server/app.js
-  app.use('/api', require('./server/app'));
-  console.log('Using built-in API server in production mode');
+  console.log('Running in production mode');
+  
+  // Import and connect to database
+  const connectDB = require('./server/config/db');
+  connectDB()
+    .then(() => console.log('MongoDB connected in production mode'))
+    .catch(err => console.error('MongoDB connection error:', err.message));
+  
+  // Import API routes
+  const apiRoutes = require('./server/routes/index');
+  
+  // Mount API routes
+  app.use('/api', apiRoutes);
 } else {
   // In development, proxy API requests to the backend server
+  console.log('Running in development mode - proxying API requests to backend server');
+  
+  const apiProxy = createProxyMiddleware('/api', {
+    target: 'http://localhost:5000',
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api': '/api'
+    },
+    onProxyReq: (proxyReq, req, res) => {
+      console.log(`Proxying request to: ${proxyReq.path}`);
+    },
+    onError: (err, req, res) => {
+      console.error('Proxy error:', err);
+      res.status(500).send('Proxy Error');
+    }
+  });
+  
   app.use('/api', apiProxy);
-  console.log('Proxying API requests to backend server in development mode');
 }
 
+// Debug - check Angular build path
+const angularBuildPath = path.join(__dirname, 'client/dist/sports-website/browser');
+console.log(`Checking for Angular build at: ${angularBuildPath}`);
+console.log(`Directory exists: ${require('fs').existsSync(angularBuildPath)}`);
+
 // Serve static files from the Angular app build directory
-app.use(express.static(path.join(__dirname, 'client/dist/sports-website')));
+app.use(express.static(angularBuildPath));
 
 // For all GET requests that aren't to API or static files, send back index.html
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/dist/sports-website/index.html'));
+  res.sendFile(path.join(angularBuildPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
