@@ -128,20 +128,20 @@ exports.updateComment = asyncHandler(async (req, res) => {
     ).populate('user', ['name', 'email', 'avatar']);
     
     // Format updated comment for frontend
-    const formattedComment = {
-      id: comment._id,
-      text: comment.text,
-      postId: comment.postId,
-      author: comment.user.name,
-      authorEmail: comment.user.email,
-      date: comment.date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
-      user: comment.user._id,
-      likes: comment.likes.length
-    };
+    // Format comment for frontend
+  const formattedComment = {
+    id: comment._id,
+    text: comment.text,
+    postId: comment.postId,
+    author: comment.user.name,
+    authorEmail: comment.user.email,
+    date: comment.date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }),
+    user: comment.user._id
+  };
     
     res.json(formatResponse(true, 'Comment updated successfully', formattedComment));
   });

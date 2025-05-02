@@ -22,11 +22,6 @@ const Schema = mongoose.Schema;
  *           type: string
  *           description: ID of the post this comment belongs to
  *           pattern: ^[a-z]+-[a-z]+-\d+$
- *         likes:
- *           type: array
- *           items:
- *             type: string
- *           description: Array of user IDs who liked the comment
  *         date:
  *           type: string
  *           format: date-time
@@ -50,21 +45,10 @@ const CommentSchema = new Schema({
     // Add validation pattern to ensure consistent IDs
     match: [/^[a-z]+-[a-z]+-\d+$/, 'Post ID format should be category-type-number (e.g., basketball-news-1)']
   },
-  likes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'User'
-    }
-  ],
   date: {
     type: Date,
     default: Date.now
   }
-});
-
-// Virtual for like count
-CommentSchema.virtual('likeCount').get(function() {
-  return this.likes.length;
 });
 
 // Virtual for formatted date

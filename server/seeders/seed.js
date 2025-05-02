@@ -2,41 +2,49 @@ const mongoose = require('mongoose');
 const config = require('../config/config');
 const { exec } = require('child_process');
 const path = require('path');
+const User = require('../models/user'); // Changed to lowercase
+const Comment = require('../models/Comment');
 
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(config.mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    console.log('Attempting to connect to MongoDB...');
+    console.log(`Connection string: ${config.mongoURI.replace(/:[^@]+@/, ':****@')}`);
+    
+    await mongoose.connect(config.mongoURI);
+    
     console.log('MongoDB connected for seeding...');
+    return true;
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
-    process.exit(1);
+    return false;
   }
 };
 
-// Run all seeders in sequence
-const runAllSeeders = async () => {
+// Clear all collections before seeding
+const clearCollections = async () => {
   try {
-    await connectDB();
+    console.log('Clearing existing collections...');
     
-    console.log('Starting database seeding process...');
+    // Get all collections
+    const collections = mongoose.connection.collections;
     
-    // Run seeders in order (no need for postSeeder as posts are hardcoded)
-    await runSeeder('userSeeder.js');
-    await runSeeder('commentSeeder.js');
+    // Drop each collection
+    for (const key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany({});
+      console.log(`Collection ${key} cleared`);
+    }
     
-    console.log('All data seeded successfully! 🎉');
-    process.exit(0);
+    console.log('All collections cleared successfully');
+    return true;
   } catch (err) {
-    console.error('Error running seeders:', err.message);
-    process.exit(1);
+    console.error('Error clearing collections:', err.message);
+    return false;
   }
 };
 
-// Helper function to run a seeder file
+// Run a seeder file
 const runSeeder = (seederFile) => {
   return new Promise((resolve, reject) => {
     const seederPath = path.join(__dirname, seederFile);
@@ -54,6 +62,50 @@ const runSeeder = (seederFile) => {
       resolve();
     });
   });
+};
+
+// Run all seeders in sequence
+const runAllSeeders = async () => {
+  try {
+    // Connect to MongoDB
+    const connected = await connectDB();
+    if (!connected) {
+      console.error('Failed to connect to MongoDB. Exiting...');
+      process.exit(1);
+    }
+    
+    // Clear all collections
+    const cleared = await clearCollections();
+    if (!cleared) {
+      console.error('Failed to clear collections. Exiting...');
+      process.exit(1);
+    }
+    
+    console.log('Starting database seeding process...');
+    
+    // Run seeders in order
+    await runSeeder('userSeeder.js');
+    await runSeeder('commentSeeder.js');
+    
+    console.log('All data seeded successfully! 🎉');
+    
+    // Display summary of seeded data
+    const userCount = await User.countDocuments();
+    const commentCount = await Comment.countDocuments();
+    
+    console.log(`Summary of seeded data:`);
+    console.log(`- Users: ${userCount}`);
+    console.log(`- Comments: ${commentCount}`);
+    
+    // Disconnect from MongoDB
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
+    
+    process.exit(0);
+  } catch (err) {
+    console.error('Error running seeders:', err.message);
+    process.exit(1);
+  }
 };
 
 // Start seeding process

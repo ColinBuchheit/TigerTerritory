@@ -11,7 +11,6 @@ export interface Comment {
   date?: string;
   author?: string;
   authorEmail?: string;
-  likes?: string[];
 }
 
 export interface CommentResponse {
@@ -70,19 +69,5 @@ export class CommentService {
    */
   deleteComment(commentId: string): Observable<CommentResponse> {
     return this.http.delete<CommentResponse>(`${this.apiUrl}/${commentId}`);
-  }
-
-  /**
-   * Like a comment
-   */
-  likeComment(commentId: string): Observable<CommentResponse> {
-    return this.http.put<CommentResponse>(`${this.apiUrl}/${commentId}/like`, {});
-  }
-
-  /**
-   * Unlike a comment
-   */
-  unlikeComment(commentId: string): Observable<CommentResponse> {
-    return this.http.put<CommentResponse>(`${this.apiUrl}/${commentId}/unlike`, {});
   }
 }

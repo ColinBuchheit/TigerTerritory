@@ -6,10 +6,7 @@ const config = require('../config/config');
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(config.mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(config.mongoURI);
     console.log('MongoDB connected for seeding comments...');
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
@@ -34,16 +31,31 @@ const seedComments = async () => {
       process.exit(1);
     }
     
-    // Sample hardcoded post IDs (matching what you'll use in frontend)
+    // Sample post IDs mapping to different sports categories
     const postIds = [
-      'basketball-news-1',
+      // Football posts
       'football-news-1',
-      'tennis-news-1',
-      'soccer-news-1',
-      'baseball-news-1'
+      'football-news-2',
+      'football-news-3',
+      'football-news-4',
+      // Basketball posts
+      'basketball-news-1',
+      'basketball-news-2',
+      'basketball-news-3',
+      'basketball-news-4',
+      // Baseball posts
+      'baseball-news-1',
+      'baseball-news-2',
+      'baseball-news-3',
+      'baseball-news-4',
+      // Wrestling posts
+      'wrestling-news-1',
+      'wrestling-news-2',
+      'wrestling-news-3',
+      'wrestling-news-4'
     ];
     
-    // Sample comments data
+    // Generate comments
     const comments = [];
     
     // Generate comments for each post
@@ -52,9 +64,8 @@ const seedComments = async () => {
       let category = 'Other';
       if (postId.includes('basketball')) category = 'Basketball';
       if (postId.includes('football')) category = 'Football';
-      if (postId.includes('tennis')) category = 'Tennis';
-      if (postId.includes('soccer')) category = 'Soccer';
       if (postId.includes('baseball')) category = 'Baseball';
+      if (postId.includes('wrestling')) category = 'Wrestling';
       
       // Add 3-5 comments per post
       const commentCount = Math.floor(Math.random() * 3) + 3;
@@ -63,24 +74,33 @@ const seedComments = async () => {
         // Random user for each comment
         const user = users[Math.floor(Math.random() * users.length)];
         
+        // Random date within the last week
+        const date = new Date();
+        date.setDate(date.getDate() - Math.floor(Math.random() * 7));
+        
         comments.push({
-          text: getSampleComment(category, i),
+          text: generateCommentText(category, i),
           user: user._id,
           postId: postId,
-          date: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)) // Random date within the last week
+          date: date
         });
       }
     }
     
     // Insert comments
     const savedComments = await Comment.insertMany(comments);
-    console.log('Comments seeded successfully');
+    console.log(`${savedComments.length} comments seeded successfully`);
     
-    // Get and log the created comments
-    const seededComments = await Comment.find();
-    console.log(`${seededComments.length} comments created`);
+    // Log a few sample comments
+    console.log('Sample comments:');
+    for (let i = 0; i < Math.min(5, savedComments.length); i++) {
+      const comment = savedComments[i];
+      const user = await User.findById(comment.user);
+      console.log(`- "${comment.text.substring(0, 30)}..." by ${user.name} on ${comment.postId}`);
+    }
     
-    process.exit();
+    mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
   } catch (err) {
     console.error('Error seeding comments:', err.message);
     process.exit(1);
@@ -88,49 +108,62 @@ const seedComments = async () => {
 };
 
 // Helper function to generate sample comments based on post category
-function getSampleComment(category, index) {
+function generateCommentText(category, index) {
   const commentsByCategory = {
     Basketball: [
       "Great analysis! I think the key matchup will be in the backcourt.",
-      "LeBron has been playing at an MVP level lately. Can't wait to watch!",
-      "Warriors' bench needs to step up if they want to win this one.",
-      "Home court advantage will be crucial in this matchup.",
-      "Both teams need this win for playoff positioning."
+      "Looking forward to seeing how the team develops this season!",
+      "That three-pointer in the final seconds was incredible!",
+      "Defense needs to improve if we want to make a tournament run.",
+      "Coach made some smart adjustments in the second half.",
+      "The bench really stepped up when we needed them.",
+      "Can't wait for the next game. M-I-Z!",
+      "This recruiting class looks incredible. Future is bright!",
+      "That's exactly the type of win we needed to build momentum."
     ],
     Football: [
-      "I'm not sold on this QB class. None of them look like franchise players.",
-      "The top prospect has a great arm but needs to work on decision making.",
-      "Draft position is so important for QB development.",
-      "I hope my team trades up to get the top prospect!",
-      "Accuracy and leadership are more important than arm strength."
-    ],
-    Tennis: [
-      "The clay court season is always so unpredictable.",
-      "I'm excited to see if any newcomers can challenge the established stars.",
-      "Injuries have really changed the landscape this year.",
-      "The women's draw looks more competitive than the men's this time.",
-      "Serving well will be key on these fast courts."
-    ],
-    Soccer: [
-      "The English teams have a good chance this year.",
-      "Away goals rule makes these matchups so strategic.",
-      "Can't wait to see the tactical battles between these coaches.",
-      "The underdogs have nothing to lose and that makes them dangerous.",
-      "The atmosphere for these games is going to be incredible!"
+      "The offensive line is really starting to gel together.",
+      "Our defense came up huge when it mattered most.",
+      "That touchdown pass was perfectly thrown!",
+      "We need better play calling in the red zone.",
+      "I'm impressed with how the freshmen are performing.",
+      "Great to see us finally beat a top-ranked team!",
+      "Hope the quarterback's ankle injury isn't serious.",
+      "The secondary played their best game of the season.",
+      "This coaching staff has completely transformed the program."
     ],
     Baseball: [
-      "It's still early in the season, but some trends are concerning.",
-      "Pitching wins championships! The teams with depth will prevail.",
-      "Injuries are already impacting several contenders.",
-      "The rookie class this year is exceptional.",
-      "Analytics are changing how we evaluate early season performance."
+      "That pitching performance was masterful. Complete command of the strike zone.",
+      "We need more consistent hitting with runners in scoring position.",
+      "The double play in the 8th inning saved the game.",
+      "Great series win against a tough conference opponent.",
+      "The bullpen has been lights out this season.",
+      "That diving catch in center field was SportsCenter worthy!",
+      "The freshman shortstop is playing like a veteran.",
+      "Perfect execution on that hit and run play.",
+      "Weather conditions made pitching difficult today."
+    ],
+    Wrestling: [
+      "Great technique on display in that final match.",
+      "Looking like a serious contender for the conference championship.",
+      "The heavyweight division is so competitive this year.",
+      "That comeback victory showed incredible heart and determination.",
+      "Coach has really built this program back to national prominence.",
+      "The freshman class is already making a huge impact.",
+      "That takedown in the final seconds was clutch!",
+      "Need more consistency in the middle weight classes.",
+      "So proud of our All-American selections this year!"
     ],
     Other: [
-      "Great article! Thanks for the insights.",
-      "I have a different perspective on this issue.",
-      "Looking forward to more coverage on this topic.",
-      "The analysis could be more in-depth, but good overview.",
-      "I've been following this closely and agree with your take."
+      "Great article! Thanks for the coverage.",
+      "Really informative analysis. Keep it up!",
+      "Looking forward to more updates on this story.",
+      "This is why I follow Tiger Territory for my Mizzou sports news.",
+      "Appreciate the in-depth reporting.",
+      "Thanks for keeping us fans in the loop!",
+      "Couldn't agree more with this take.",
+      "Excited to see how this develops.",
+      "You always have the best Mizzou coverage!"
     ]
   };
   

@@ -137,7 +137,7 @@ private storeUserData(userData: any): void {
   /**
    * Get user data from localStorage
    */
-  private getUserFromStorage(): UserProfile | null {
+  getUserFromStorage(): UserProfile | null {
     const userData = localStorage.getItem('user_data');
     if (userData) {
       try {

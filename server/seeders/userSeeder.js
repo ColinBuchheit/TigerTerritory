@@ -1,15 +1,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const User = require('../models/user');
+const User = require('../models/user'); // Changed to lowercase
 const config = require('../config/config');
 
 // Connect to MongoDB
 const connectDB = async () => {
   try {
-    await mongoose.connect(config.mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(config.mongoURI);
     console.log('MongoDB connected for seeding users...');
   } catch (err) {
     console.error('Error connecting to MongoDB:', err.message);
@@ -26,20 +23,26 @@ const users = [
     role: 'admin'
   },
   {
-    name: 'Best Guy',
-    email: 'Best@example.com',
+    name: 'John Doe',
+    email: 'john@example.com',
     password: 'password123',
     role: 'user'
   },
   {
-    name: 'This Guy',
-    email: 'Guy@example.com',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
     password: 'password123',
     role: 'user'
   },
   {
     name: 'Sports Blogger',
     email: 'blogger@example.com',
+    password: 'password123',
+    role: 'user'
+  },
+  {
+    name: 'Tiger Fan',
+    email: 'tiger@example.com',
     password: 'password123',
     role: 'user'
   }
@@ -74,7 +77,8 @@ const seedUsers = async () => {
       console.log(`- ${user.name} (${user.email}) - ${user.role}`);
     });
     
-    process.exit();
+    mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
   } catch (err) {
     console.error('Error seeding users:', err.message);
     process.exit(1);
