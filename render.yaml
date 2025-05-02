@@ -1,12 +1,14 @@
 services:
   - type: web
-    name: tiger-territory-frontend
+    name: tigerterritory
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: npm install && cd client && npm install && npm run build && cd ..
+    startCommand: node server.js
     envVars:
       - key: NODE_VERSION
         value: 18.x
       - key: NODE_ENV
         value: production
-    healthCheckPath: /
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api
