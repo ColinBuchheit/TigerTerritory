@@ -26,10 +26,10 @@ exports.asyncHandler = (handler) => {
     try {
       await handler(req, res, next);
     } catch (err) {
-      console.error(err.message);
+      console.error('Controller error:', err.message);
       
       // Handle ObjectId casting errors
-      if (err.kind === 'ObjectId') {
+      if (err.name === 'CastError' && err.kind === 'ObjectId') {
         return res.status(404).json(formatResponse(false, 'Resource not found', null));
       }
       
@@ -38,8 +38,19 @@ exports.asyncHandler = (handler) => {
         return res.status(400).json(formatResponse(false, 'Validation Error', err.errors));
       }
       
-      // Handle generic server errors
-      res.status(500).json(formatResponse(false, 'Server error', null));
+      // Handle duplicate key errors
+      if (err.code === 11000) {
+        const field = Object.keys(err.keyValue)[0];
+        const value = err.keyValue[field];
+        return res.status(400).json(formatResponse(
+          false,
+          `Duplicate value: ${field} with value '${value}' already exists`,
+          null
+        ));
+      }
+      
+      // Pass to global error handler
+      next(err);
     }
   };
 };
@@ -75,8 +86,11 @@ exports.checkUnauthorized = (resource, userId, res, userRole = 'user', action = 
   }
   
   // For regular users, check if they own the resource
-  if (resource.user.toString() !== userId) {
-    res.status(401).json(formatResponse(false, `Not authorized to ${action} this resource`, null));
+  // Handle both string IDs and object IDs
+  const resourceUserId = resource.user.toString ? resource.user.toString() : resource.user;
+  
+  if (resourceUserId !== userId) {
+    res.status(403).json(formatResponse(false, `Not authorized to ${action} this resource`, null));
     return true;
   }
   return false;

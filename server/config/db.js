@@ -5,7 +5,17 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(config.mongoURI);
+    // Better connection options
+    const options = {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+    };
+    
+    console.log(`Attempting to connect to MongoDB at: ${config.mongoURI.replace(/:[^@]+@/, ':*****@')}`);
+    
+    const conn = await mongoose.connect(config.mongoURI, options);
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
@@ -24,12 +34,20 @@ const connectDB = async () => {
       process.exit(0);
     });
     
+    return conn;
   } catch (err) {
     console.error(`Error connecting to MongoDB: ${err.message}`);
-    process.exit(1);
+    if (err.name === 'MongooseServerSelectionError') {
+      console.error('Could not connect to any MongoDB servers. Check your connection string and ensure your MongoDB server is running.');
+    }
+    
+    // Only exit if called directly - allow error handling elsewhere if imported
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw err;
+    }
   }
 };
-
-console.log("Trying to connect to:", config.mongoURI.replace(/:[^@]+@/, ':*****@'));
 
 module.exports = connectDB;

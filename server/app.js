@@ -8,13 +8,6 @@ const swaggerDocs = require('./config/swagger');
 // Import database connection
 const connectDB = require('./config/db');
 
-// Import routes
-const indexRoutes = require('./routes/index');
-
-// Import middleware
-const errorHandler = require('./middleware/errorHandler');
-const { apiLimiter } = require('./middleware/rateLimiter');
-
 // Create Express app
 const app = express();
 
@@ -32,6 +25,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Rate limiting in production
 if (process.env.NODE_ENV === 'production') {
+  const { apiLimiter } = require('./middleware/rateLimiter');
   app.use('/api/', apiLimiter);
 }
 
@@ -44,16 +38,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, {
   }
 }));
 
-// Connect to database if running directly
-if (require.main === module) {
-  connectDB()
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err.message));
-}
-
-// Routes
-app.use('/api', indexRoutes);
-
 // Base route with info
 app.get('/', (req, res) => {
   res.json({
@@ -62,7 +46,46 @@ app.get('/', (req, res) => {
   });
 });
 
-// Error handling middleware
+// Connect to database before setting up routes
+const setupRoutes = async () => {
+  try {
+    // Import routes
+    const indexRoutes = require('./routes/index');
+    
+    // Routes
+    app.use('/api', indexRoutes);
+    
+    console.log('Routes initialized successfully');
+  } catch (err) {
+    console.error('Error initializing routes:', err.message);
+  }
+};
+
+// Connect to database if running directly
+if (require.main === module) {
+  connectDB()
+    .then(() => {
+      console.log('MongoDB connected');
+      return setupRoutes();
+    })
+    .catch(err => {
+      console.error('MongoDB connection error:', err.message);
+      process.exit(1);
+    });
+} else {
+  // When imported as a module (e.g., for testing)
+  connectDB()
+    .then(() => {
+      console.log('MongoDB connected');
+      return setupRoutes();
+    })
+    .catch(err => {
+      console.error('MongoDB connection error when imported as module:', err.message);
+    });
+}
+
+// Error handling middleware - must be after routes
+const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);
 
 // Start server if running directly

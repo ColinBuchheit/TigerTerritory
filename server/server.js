@@ -27,6 +27,7 @@ const server = http.createServer(app);
 // Error handling listeners
 server.on('error', (error) => {
   if (error.syscall !== 'listen') {
+    console.error('Server error not related to listening:', error);
     throw error;
   }
   
@@ -40,22 +41,21 @@ server.on('error', (error) => {
       break;
     case 'EADDRINUSE':
       console.error(`${bind} is already in use`);
+      console.error('Try using a different port by setting the PORT environment variable');
       process.exit(1);
       break;
     default:
+      console.error('Unhandled server error:', error);
       throw error;
   }
 });
 
-app.get('/', (req, res) => {
-  res.send('Sports Website API is running...');
-});
-
-
 server.on('listening', () => {
   const addr = server.address();
   const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  console.log(`Server running in ${process.env.NODE_ENV} mode on ${bind}`);
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on ${bind}`);
+  console.log(`API available at http://localhost:${port}/api`);
+  console.log(`API documentation at http://localhost:${port}/api-docs`);
 });
 
 // Start the server
@@ -63,10 +63,26 @@ server.listen(port);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
-  console.log('Unhandled Rejection! Shutting down...');
+  console.log('UNHANDLED REJECTION! Shutting down...');
   console.log(err.name, err.message);
-  // Close server & exit process
+  console.log(err.stack);
+  
+  // Close server & exit process gracefully
   server.close(() => {
     process.exit(1);
   });
+  
+  // If server doesn't close in 5 seconds, force exit
+  setTimeout(() => {
+    console.error('Forcing process exit after timeout');
+    process.exit(1);
+  }, 5000);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION! Shutting down...');
+  console.log(err.name, err.message);
+  console.log(err.stack);
+  process.exit(1);
 });

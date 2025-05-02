@@ -6,10 +6,11 @@ const { formatResponse } = require('../utils/responseFormatter');
  */
 module.exports = (err, req, res, next) => {
   // Log error for debugging
+  console.error('Error encountered:', err);
   console.error(err.stack);
   
-  // Default to 500 server error
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  // Only set status code to 500 if it's not already an error code
+  const statusCode = res.statusCode >= 400 ? res.statusCode : 500;
   const message = err.message || 'Server Error';
   
   // Handle different types of errors
