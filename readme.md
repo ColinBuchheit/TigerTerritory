@@ -93,7 +93,7 @@ Tiger Territory is a full-stack MEAN (MongoDB, Express, Angular, Node.js) applic
    ```bash
    # Terminal 1: Start backend server
    cd server
-   npm run dev
+   npm start
 
    # Terminal 2: Start Angular development server
    cd client
