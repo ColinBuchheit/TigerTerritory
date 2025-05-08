@@ -193,14 +193,19 @@ Our team worked collaboratively across the full stack, with each member contribu
   - CSS styling and animations
   - Cross-browser testing
 
-### 
-- **Role:** 
+### Jack Villanueva
+- **Role:** Auth Flow Login/Signup Page
 - **Contributions:**
- 
+  - Developed the frontend auth flow
+  - Responsive UI Design
+  - CSS styling
 
-### 
-- **Role:** 
+### Ryan Doak
+- **Role:** Database and Deployment
 - **Contributions:**
+  - Set up DB and Deployment
+  - Ensured Models set up correctly
+  - General Full-stack assistance where needed
 
 
 ## Deployment
@@ -228,7 +233,7 @@ The application is deployed on Render with the following configuration:
 
 Our team presentation is available on YouTube:
 
-- **Presentation Link:** [Tiger Territory Project Presentation](url_link_here)
+- **Presentation Link:** [Tiger Territory Project Presentation](https://www.youtube.com/watch?v=ZqWx5nxSU28)
 
 The presentation covers:
 - Project overview and features demonstration
